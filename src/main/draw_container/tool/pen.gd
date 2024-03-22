@@ -54,7 +54,7 @@ func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
 	var points = DrawDataUtil.get_line_points(last_point, current_point)
 	var draw_data : Dictionary = {}
 	var tmp_p : Vector2i
-	var pen_color = ProjectConfig.get_config(PropertyName.PEN.COLOR, Color.BLACK)
+	var pen_color = ProjectConfig.get_config(PropertyName.PEN.COLOR)
 	for point in points:
 		# 笔触
 		for offset_p in _stroke_points:

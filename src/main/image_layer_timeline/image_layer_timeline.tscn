@@ -1,0 +1,77 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccvi3ga25277e"]
+
+[ext_resource type="Script" path="res://src/main/image_layer_timeline/image_layer_timeline.gd" id="1_by60s"]
+
+[node name="ImageLayerTimeline" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_by60s")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "play"
+
+[node name="Button2" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "stop"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Templates" type="Node" parent="."]
+
+[node name="Item" type="HBoxContainer" parent="Templates"]
+offset_left = 31.0
+offset_top = -126.0
+offset_right = 569.0
+offset_bottom = -86.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Templates/Item"]
+layout_mode = 2
+text = "Layer 1"
+
+[node name="VSeparator" type="VSeparator" parent="Templates/Item"]
+layout_mode = 2
+
+[node name="items" type="HBoxContainer" parent="Templates/Item"]
+layout_mode = 2
+size_flags_horizontal = 3

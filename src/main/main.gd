@@ -114,5 +114,5 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 
 
 func _on_layer_buttons_selected_layers() -> void:
-	draw_container.clear_draw_layer()
-	draw_container.add_draw_layers(layer_buttons.get_selected_layer_ids())
+	draw_container.clear_select_layer()
+	draw_container.add_select_layers(layer_buttons.get_selected_layer_ids())

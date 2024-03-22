@@ -19,14 +19,14 @@ var _data: Dictionary = {}
 #  内置
 #============================================================
 func _init() -> void:
-	init_value()
+	init_property_name()
 
 
 #============================================================
 #  自定义
 #============================================================
 ## 更新 PropertyName 子类的静态变量的值为自身的名称
-static func init_value():
+static func init_property_name():
 	var class_regex = RegEx.new()
 	class_regex.compile("^class\\s+(?<class_name>\\w+)\\s*:")
 	var var_regex = RegEx.new()

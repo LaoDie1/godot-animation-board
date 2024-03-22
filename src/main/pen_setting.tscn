@@ -31,6 +31,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 focus_mode = 0
+color = Color(0.964706, 1, 0.996078, 1)
 
 [node name="Label2" type="Label" parent="MarginContainer/GridContainer"]
 layout_mode = 2
@@ -39,7 +40,8 @@ text = "Line Width"
 [node name="PenLineWidth" type="SpinBox" parent="MarginContainer/GridContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-value = 1.0
+max_value = 500.0
+value = 2.0
 
 [connection signal="color_changed" from="MarginContainer/GridContainer/PenColor" to="." method="_on_pen_color_color_changed"]
 [connection signal="value_changed" from="MarginContainer/GridContainer/PenLineWidth" to="." method="_on_pen_line_width_value_changed"]

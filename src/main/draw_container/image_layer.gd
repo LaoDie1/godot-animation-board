@@ -27,9 +27,8 @@ func _ready() -> void:
 			if property == PropertyName.IMAGE.SIZE:
 				self._rect.size = value
 	)
-	_image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
-	_image_texture = ImageTexture.create_from_image(_image)
 	custom_minimum_size = image_size
+	new_data()
 	queue_redraw()
 
 
@@ -42,6 +41,30 @@ func _draw() -> void:
 #============================================================
 #  自定义
 #============================================================
+## 新的数据
+func new_data():
+	_draw_colors = {}
+	var image_size : Vector2i = ProjectConfig.get_config(PropertyName.IMAGE.SIZE)
+	_image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
+	_image_texture = ImageTexture.create_from_image(_image)
+	queue_redraw()
+
+## 加载数据
+func load_data(data: Dictionary):
+	for p in data:
+		set(p, data[p])
+	queue_redraw()
+
+## 获取数据
+func get_data():
+	return {
+		"_rect": _rect,
+		"_image_texture": _image_texture,
+		"_draw_colors": _draw_colors,
+	}
+
+
+## 设置颜色偏移
 func set_offset_colors(offset: Vector2i):
 	# 原始数据偏移
 	var data = {}
@@ -64,6 +87,7 @@ func set_offset_colors(offset: Vector2i):
 	queue_redraw()
 
 
+## 根据数据设置颜色
 func set_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 	if data.is_empty():
 		return
