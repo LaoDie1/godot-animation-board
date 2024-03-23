@@ -30,7 +30,7 @@ grow_vertical = 2
 
 [node name="Templates" type="Node" parent="."]
 
-[node name="FrameItemTemplate" type="HBoxContainer" parent="Templates"]
+[node name="FrameTrackItemTemplate" type="HBoxContainer" parent="Templates"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 offset_left = 31.0
@@ -40,21 +40,20 @@ offset_bottom = -81.0
 size_flags_horizontal = 3
 metadata/_edit_group_ = true
 
-[node name="Label" type="Label" parent="Templates/FrameItemTemplate"]
+[node name="Label" type="Label" parent="Templates/FrameTrackItemTemplate"]
 layout_mode = 2
 mouse_filter = 1
 text = "Layer 1"
 
-[node name="VSeparator" type="VSeparator" parent="Templates/FrameItemTemplate"]
+[node name="VSeparator" type="VSeparator" parent="Templates/FrameTrackItemTemplate"]
 layout_mode = 2
 mouse_filter = 1
 
-[node name="FrameTrack" type="Control" parent="Templates/FrameItemTemplate"]
+[node name="FrameTrack" type="Control" parent="Templates/FrameTrackItemTemplate"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 script = ExtResource("2_g6gli")
-frame_image_size = 40.0
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -104,7 +103,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="frames_container" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="FrameTrackContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

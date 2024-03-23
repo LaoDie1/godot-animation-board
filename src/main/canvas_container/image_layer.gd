@@ -40,7 +40,6 @@ func _draw() -> void:
 	draw_texture(_image_texture, Vector2(0,0))
 	if self.size != Vector2(_rect.size):
 		self.size = Vector2(_rect.size)
-	image_changed.emit()
 
 
 #============================================================
@@ -89,6 +88,7 @@ func set_offset_colors(offset: Vector2i):
 	# 更新
 	_image = new_image
 	_image_texture.update(_image)
+	image_changed.emit()
 	queue_redraw()
 
 
@@ -115,5 +115,6 @@ func set_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 	
 	# 更新
 	_image_texture.update(_image)
+	image_changed.emit()
 	queue_redraw()
 

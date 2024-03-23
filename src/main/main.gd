@@ -5,12 +5,12 @@
 # - datetime: 2024-03-21 23:38:22
 # - version: 4.2.1
 #============================================================
-class_name DrawBoardMain
+class_name AnimationBoardMain
 extends Control
 
 
 @onready var menu: SimpleMenu = %SimpleMenu
-@onready var draw_container: DrawContainer = %DrawContainer
+@onready var canvas_container: CanvasContainer = %CanvasContainer
 @onready var layer_buttons: LayerButtons = %LayerButtons
 @onready var tool_button_container: BoxContainer = %tool_button_container
 @onready var image_layer_timeline: ImageLayerTimeline = %ImageLayerTimeline
@@ -29,14 +29,14 @@ func _init() -> void:
 		func(last_frame_id, frame_id):
 			# 更新上一次的帧和层数据
 			for layer_id in ProjectData.get_layer_ids():
-				var image_layer : ImageLayer = draw_container.get_image_layer(layer_id)
+				var image_layer : ImageLayer = canvas_container.get_image_layer(layer_id)
 				var texture = image_layer.get_image_texture()
 				ProjectData.update_texture(layer_id, last_frame_id, texture)
 			
 			# 加载当前帧和层的数据
 			for layer_id in ProjectData.get_layer_ids():
 				var data : Dictionary = ProjectData.get_image_data(layer_id, frame_id)
-				var image_layer : ImageLayer = draw_container.get_image_layer(layer_id)
+				var image_layer : ImageLayer = canvas_container.get_image_layer(layer_id)
 				image_layer.load_data(data)
 	)
 	
@@ -52,13 +52,12 @@ func _ready() -> void:
 	tool_button_group.pressed.connect(
 		func(tool_button: BaseButton):
 			var tool_name = tool_button.name
-			draw_container.active_tool(tool_name)
+			canvas_container.active_tool(tool_name)
 	)
 	tool_button_container.get_child(0).button_pressed = true
 	
 	# 创建图层
 	ProjectData.new_frame()
-	ProjectData.new_layer()
 	ProjectData.new_layer()
 	# 选中图层1
 	layer_buttons.select_layer(1)
@@ -117,11 +116,3 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 		_:
 			printerr("没有实现功能：", menu_path)
 
-
-func _on_layer_buttons_selected_layers() -> void:
-	ProjectData.clear_select_layer()
-	ProjectData.add_select_layers(layer_buttons.get_selected_layer_ids())
-
-
-func _on_image_layer_timeline_layer_frame_changed(last_layer_id: int, last_frame_id: int, layer_id: int, frame_id: int) -> void:
-	ProjectData.update_current_frame(frame_id)

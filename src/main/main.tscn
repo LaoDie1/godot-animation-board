@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
 [ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
-[ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/draw_container/draw_container.tscn" id="3_3liki"]
+[ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/canvas_container/canvas_container.tscn" id="3_3liki"]
 [ext_resource type="Script" path="res://src/config/project_data.gd" id="5_iwf0a"]
 [ext_resource type="Script" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
 [ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/pen_setting.tscn" id="6_ge575"]
@@ -113,7 +113,7 @@ clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DrawContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/ScrollContainer" instance=ExtResource("3_3liki")]
+[node name="CanvasContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/ScrollContainer" instance=ExtResource("3_3liki")]
 unique_name_in_owner = true
 layout_mode = 2
 anchors_preset = 0
@@ -145,5 +145,3 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 
 [connection signal="menu_pressed" from="MarginContainer/VBoxContainer/SimpleMenu" to="." method="_on_simple_menu_menu_pressed"]
-[connection signal="selected_layers" from="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer/LayerButtons" to="." method="_on_layer_buttons_selected_layers"]
-[connection signal="layer_frame_changed" from="MarginContainer/VBoxContainer/VSplitContainer/ImageLayerTimeline" to="." method="_on_image_layer_timeline_layer_frame_changed"]

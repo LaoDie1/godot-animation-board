@@ -6,7 +6,7 @@
 # - version: 4.2.1
 #============================================================
 ## 绘图容器
-class_name DrawContainer
+class_name CanvasContainer
 extends Control
 
 
@@ -95,11 +95,9 @@ func create_layer(layer_id: int):
 func get_image_layer(layer_id: int) -> ImageLayer:
 	return _id_to_layer_node[layer_id]
 
+## 获取所有画布节点
 func get_image_layer_nodes() -> Array[ImageLayer]:
-	var list : Array[ImageLayer] = []
-	for layer_id in _id_to_layer_node:
-		list.append(_id_to_layer_node[layer_id])
-	return list
+	return Array(_id_to_layer_node.values(), TYPE_OBJECT, "Control", ImageLayer)
 
 ## 更新画布
 func update_canvas():
@@ -135,4 +133,17 @@ func _on_move_move_finished() -> void:
 	var offset : Vector2 = Vector2(input_board.get_last_release_point() - input_board.get_last_pressed_point())
 	for layer_id in ProjectData.get_select_layer_ids():
 		get_image_layer(layer_id).set_offset_colors(offset)
+		var texture = get_image_layer(layer_id).get_image_texture()
+		
+		ProjectData.update_texture( layer_id, ProjectData.get_current_frame(), texture )
 
+
+func _on_pen_draw_finished() -> void:
+	var frame_id = ProjectData.get_current_frame()
+	for layer_id in ProjectData.get_select_layer_ids():
+		var texture = get_image_layer(layer_id).get_image_texture()
+		ProjectData.update_texture( layer_id, frame_id, texture )
+
+
+func _on_pen_ready_draw() -> void:
+	grab_focus()

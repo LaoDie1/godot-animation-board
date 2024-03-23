@@ -9,13 +9,9 @@ class_name LayerButtons
 extends VBoxContainer
 
 
-signal selected_layers()
-
-
 const META_KEY_ID = "_id"
 
 var _id_to_layer_data : Dictionary = {}
-var _selected_layer_ids : Array = []
 var _selected_layers : Array = []
 var _button_groups : ButtonGroup = ButtonGroup.new()
 
@@ -27,14 +23,21 @@ func _init() -> void:
 	_button_groups.pressed.connect(
 		func(button):
 			var id = button.get_meta(META_KEY_ID)
-			var data = get_layer_data(id)
-			_selected_layers.append(data["node"])
-			
-			_selected_layer_ids.clear()
-			_selected_layer_ids = [id]
-			self.selected_layers.emit()
+			ProjectData.clear_select_layer()
+			ProjectData.add_select_layers([id])
 	)
 	ProjectData.newly_layer.connect(create_layer)
+	ProjectData.select_layers_changed.connect(
+		func():
+			var layers_ids = ProjectData.get_select_layer_ids()
+			for layer_id in _id_to_layer_data:
+				var button : BaseButton = _id_to_layer_data[layer_id]["node"]
+				if layers_ids.has(layer_id):
+					if not button.button_pressed:
+						button.button_pressed = true
+				else:
+					button.button_pressed = false
+	)
 
 
 #============================================================
@@ -49,9 +52,6 @@ func _create_layer_node(b_name: String) -> Control:
 	add_child(button)
 	move_child(button, 0)
 	return button
-
-func get_selected_layer_ids() -> Array:
-	return _selected_layer_ids
 
 func get_layer_data(id: int) -> Dictionary:
 	return _id_to_layer_data.get(id, {})
@@ -72,4 +72,5 @@ func create_layer(id: int) -> bool:
 
 func select_layer(layer_id: int):
 	get_layer_data(layer_id)["node"].button_pressed = true
+	ProjectData.add_select_layer(layer_id)
 

@@ -10,8 +10,10 @@ class_name Tool_Pen
 extends ToolBase
 
 
+signal ready_draw()
 ## 绘制
 signal drawn(data: Dictionary)
+signal draw_finished()
 
 
 var _stroke_points : Array[Vector2i] = [] # 绘制时的笔触大小
@@ -48,6 +50,7 @@ func config_changed(property, last_value, value):
 
 func _pressed():
 	_drawn_points_color.clear()
+	ready_draw.emit()
 
 
 func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
@@ -64,3 +67,7 @@ func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
 				draw_data[tmp_p] = pen_color
 		if not draw_data.is_empty():
 			drawn.emit(draw_data)
+
+
+func _release():
+	draw_finished.emit()

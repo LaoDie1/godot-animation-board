@@ -17,6 +17,7 @@ extends ScrollContainer
 func _ready() -> void:
 	ProjectData.set_config(PropertyName.PEN.COLOR, pen_color.color)
 	ProjectData.set_config(PropertyName.PEN.LINE_WIDTH, pen_line_width.value)
+	pen_line_width.get_line_edit().focus_mode = Control.FOCUS_CLICK
 
 
 

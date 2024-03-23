@@ -10,8 +10,10 @@
 ##这里统一处理整个项目的数据
 extends Node
 
+
 const DEFAULT_LAYER = 1
 const DEFAULT_FRAME = 1
+const THUMBNAILS_SIZE = Vector2i(40, 40) # 缩略图大小
 
 
 #============================================================
@@ -92,9 +94,10 @@ signal newly_layer(layer_id: int)
 signal newly_frame(frame_id: int)
 signal frame_changed(last_frame_id: int, frame_id: int)
 signal texture_changed(layer_id: int, frame_id: int)
+signal select_layers_changed()
 
 
-var _current_frame : int = 0
+var _current_frame : int = 1
 var _auto_incr_layer_id : int = 0
 var _auto_incr_frame_id : int = 0
 var _frame_ids : Dictionary = {} # 帧ID列表
@@ -147,8 +150,6 @@ func new_layer() -> int:
 ## 新的动画帧
 func new_frame() -> int:
 	_auto_incr_frame_id += 1
-	if _auto_incr_frame_id == 1:
-		_current_frame = 1
 	_frame_ids[_auto_incr_frame_id] = null
 	# 所有层增加新的帧图像
 	for layer_id in get_layer_ids():
@@ -176,21 +177,55 @@ func update_texture(layer_id: int, frame_id: int, texture: ImageTexture):
 	var data = get_image_data(layer_id, frame_id)
 	data[PropertyName.KEY.TEXTURE] = texture
 	var id = "%d,%d" % [layer_id, frame_id]
-	_id_to_thumbnails.erase(id)
+	_update_thumbnails(layer_id, frame_id, texture)
 	texture_changed.emit(layer_id, frame_id, texture)
 
-## 添加可绘制到的层
-func add_select_layer(layer_id: int):
-	_selected_layer_ids[layer_id] = null
+func _update_thumbnails(layer_id: int, frame_id: int, texture: ImageTexture):
+	var id = "%d,%d" % [layer_id, frame_id]
+	var _texture := get_image_texture(layer_id, frame_id).duplicate(true) as ImageTexture
+	_texture.set_size_override( THUMBNAILS_SIZE )
+	_id_to_thumbnails[ id ] = _texture
+
+## 获取缩略图
+func get_thumbnails(layer_id: int, frame_id: int) -> ImageTexture:
+	var id = "%d,%d" % [layer_id, frame_id]
+	#var id = "%d,%d,%s" % [layer_id, frame_id, size]
+	if not _id_to_thumbnails.has(id):
+		var texture = get_image_texture(layer_id, frame_id).duplicate(true)
+		_update_thumbnails(layer_id, frame_id, texture)
+	return _id_to_thumbnails[id]
+
+## 添加选中的层
+func add_select_layer(layer_id: int) -> bool:
+	if not _selected_layer_ids.has(layer_id):
+		_selected_layer_ids[layer_id] = null
+		select_layers_changed.emit()
+		return true
+	return false
+
+## 移除选中的层
+func remove_select_layer(layer_id: int) -> bool:
+	if _selected_layer_ids.erase(layer_id):
+		select_layers_changed.emit()
+		return true
+	return false
 
 ## 添加可绘制到的层
 func add_select_layers(layer_ids: Array):
-	for id in layer_ids:
-		_selected_layer_ids[id] = null
+	var added = false
+	for layer_id in layer_ids:
+		if add_select_layer(layer_id):
+			added = true
+	if added:
+		select_layers_changed.emit()
 
 ## 清除可绘制到的层
 func clear_select_layer():
 	_selected_layer_ids.clear()
+
+## 是选中的层
+func is_select_layer(layer_id: int) -> bool:
+	return _selected_layer_ids.has(layer_id)
 
 ## 获取选中的层
 func get_select_layer_ids() -> Array:
@@ -207,15 +242,4 @@ func get_current_frame() -> int:
 
 func get_image_data_by_current_frame(layer_id: int) -> Dictionary:
 	return get_image_data(layer_id, _current_frame)
-
-## 获取缩略图
-func get_thumbnails(layer_id: int, frame_id: int) -> ImageTexture:
-	var size = Vector2i(40, 40)
-	var id = "%d,%d" % [layer_id, frame_id]
-	#var id = "%d,%d,%s" % [layer_id, frame_id, size]
-	if not _id_to_thumbnails.has(id):
-		var texture := get_image_texture(layer_id, frame_id).duplicate(true) as ImageTexture
-		texture.set_size_override( size )
-		_id_to_thumbnails[ id ] = texture
-	return _id_to_thumbnails[id]
 
