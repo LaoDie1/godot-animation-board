@@ -48,6 +48,8 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	#theme = preload("res://src/main/theme.tres")
+	
 	_init_menu()
 	
 	ProjectData.set_config(PropertyName.IMAGE.RECT, Rect2i(0, 0, 500, 500))

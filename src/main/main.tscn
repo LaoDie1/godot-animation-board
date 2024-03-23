@@ -41,6 +41,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_46xse")
 
+[node name="Panel" type="Panel" parent="."]
+modulate = Color(0.85098, 0.85098, 0.85098, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -61,6 +70,9 @@ unique_name_in_owner = true
 layout_mode = 2
 flat = true
 script = ExtResource("1_3rbfd")
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
 
 [node name="top_toolbar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -148,18 +160,21 @@ layout_mode = 2
 layout_mode = 2
 tab_focus_mode = 0
 
+[node name="PenSetting" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer" instance=ExtResource("6_ge575")]
+layout_mode = 2
+
 [node name="LayerButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer"]
 unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_lepq6")
-
-[node name="PenSetting" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer" instance=ExtResource("6_ge575")]
 visible = false
 layout_mode = 2
+script = ExtResource("5_lepq6")
 
 [node name="ImageLayerTimeline" parent="MarginContainer/VBoxContainer/VSplitContainer" instance=ExtResource("7_i4wsq")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]

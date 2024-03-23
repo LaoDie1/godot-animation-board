@@ -205,8 +205,19 @@ func _on_play_pressed() -> void:
 
 
 func _on_stop_pressed() -> void:
-	pass # Replace with function body.
 	if _played_frame_point != -1:
 		ProjectData.update_current_frame_by_point(_played_frame_point)
 		_played_frame_point = -1
 		_play_status = PAUSE
+
+
+func _on_remove_frame_pressed() -> void:
+	var frame_id = ProjectData.get_current_frame_id()
+	ProjectData.remove_frame(frame_id)
+
+
+func _on_last_frame_pressed() -> void:
+	ProjectData.offset_current_frame(-1)
+
+func _on_next_frame_pressed() -> void:
+	ProjectData.offset_current_frame(1)

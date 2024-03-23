@@ -226,6 +226,10 @@ var _id_to_thumbnails : Dictionary = {} # id对应的缩略图
 func get_image_data(layer_id: float, frame_id: float) -> Dictionary:
 	return _layer_frame_to_image_data[layer_id][frame_id]
 
+## 获取当前帧的这一层的图像数据
+func get_image_data_by_current_frame(layer_id: float) -> Dictionary:
+	return get_image_data(layer_id, get_current_frame_id())
+
 ## 获取图像贴图
 func get_image_texture(layer_id: float, frame_id: float) -> ImageTexture:
 	var data : Dictionary = get_image_data(layer_id, frame_id)
@@ -536,6 +540,12 @@ func get_frame_id(idx: int) -> float:
 func get_current_frame_point() -> int:
 	return _current_frame_point
 
-## 获取当前帧的这一层的图像数据
-func get_image_data_by_current_frame(layer_id: float) -> Dictionary:
-	return get_image_data(layer_id, get_current_frame_id())
+## 偏移当前帧
+func offset_current_frame(offset: int):
+	var frame_point = get_current_frame_point()
+	frame_point += offset
+	if frame_point < 0:
+		frame_point = 0
+	elif frame_point >= get_frame_count():
+		frame_point = get_frame_count() - 1
+	update_current_frame_by_point(frame_point)

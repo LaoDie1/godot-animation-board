@@ -190,6 +190,7 @@ size_flags_horizontal = 3
 metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="Templates/FrameTrackItemTemplate"]
+custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 mouse_filter = 1
 text = "Layer 1"
@@ -251,6 +252,13 @@ focus_mode = 0
 text = "Insert Frame"
 icon_alignment = 1
 
+[node name="RemoveFrame" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+focus_mode = 0
+text = "Remove Frame"
+icon_alignment = 1
+
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
@@ -291,6 +299,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/separator = SubResource("StyleBoxEmpty_sxj4b")
 
+[node name="VSeparator4" type="VSeparator" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
 [node name="Onionskin" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
@@ -319,6 +331,9 @@ libraries = {
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/NewLayer" to="." method="_on_new_layer_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/NewFrame" to="." method="_on_new_frame_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/InsertFrame" to="." method="_on_insert_frame_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/RemoveFrame" to="." method="_on_remove_frame_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/Stop" to="." method="_on_stop_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/LastFrame" to="." method="_on_last_frame_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonsContainer/NextFrame" to="." method="_on_next_frame_pressed"]
 [connection signal="toggled" from="MarginContainer/VBoxContainer/ButtonsContainer/Onionskin" to="." method="_on_onionskin_toggled"]
