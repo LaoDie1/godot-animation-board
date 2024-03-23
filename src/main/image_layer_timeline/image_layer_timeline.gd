@@ -17,6 +17,10 @@ enum {
 	PLAY_BACKWARD = 1, ## 向后播放
 }
 
+
+signal play_state_changed(state)
+
+
 ## 时间线上显示的帧进行偏移偏移
 @export var offset_frame: int :
 	set(v):
@@ -33,13 +37,22 @@ enum {
 @onready var frame_track_item_template: HBoxContainer = %FrameTrackItemTemplate
 @onready var frame_track_container: VBoxContainer = %FrameTrackContainer
 @onready var buttons_container: HBoxContainer = %ButtonsContainer
+@onready var play_button: Button = %Play
 
 var _coords_to_images : Dictionary = {}
 var _layer_id_to_frame_track : Dictionary = {}
 var _play_status : int = PAUSE:
 	set(v):
-		_play_status = clampi(v, PLAY_FORWARD, PLAY_BACKWARD)
-		set_process(_play_status != PAUSE)
+		var state = clampi(v, PLAY_FORWARD, PLAY_BACKWARD)
+		if _play_status != state:
+			_play_status = state
+			set_process(_play_status != PAUSE)
+			play_state_changed.emit(_play_status)
+			if _play_status == PAUSE:
+				play_button.icon = theme.get("EditorIcons/icons/Play")
+			else:
+				play_button.icon = theme.get("EditorIcons/icons/Pause")
+		
 var _play_time : float = 0.0
 
 
@@ -78,6 +91,12 @@ func _init() -> void:
 		func():
 			for layer_id in ProjectData.get_layer_ids():
 				get_frame_track(layer_id).queue_redraw()
+	)
+	ProjectData.frame_changed.connect(
+		func(last_frame_id, frame_id):
+			for layer_id in ProjectData.get_layer_ids():
+				var frame_track = get_frame_track(layer_id)
+				frame_track.queue_redraw()
 	)
 
 
@@ -175,13 +194,19 @@ func _on_insert_frame_pressed() -> void:
 	ProjectData.menu_insert_frame()
 
 
+var _played_frame_point : int = -1
 func _on_play_pressed() -> void:
 	if ProjectData.get_frame_count() > 1:
 		if _play_status == PAUSE:
 			_play_status = PLAY_BACKWARD
+			_played_frame_point = ProjectData.get_current_frame_point()
 		else:
 			_play_status = PAUSE
 
 
 func _on_stop_pressed() -> void:
 	pass # Replace with function body.
+	if _played_frame_point != -1:
+		ProjectData.update_current_frame_by_point(_played_frame_point)
+		_played_frame_point = -1
+		_play_status = PAUSE

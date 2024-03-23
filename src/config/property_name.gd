@@ -20,8 +20,10 @@ class KEY:
 # 工具数据
 class TOOL:
 	static var CURRENT # 当前工具
-	static var PEN
-	static var ONIONSKIN # 洋葱皮
+	static var ONIONSKIN # 洋葱皮是否启用
+	
+	static var PEN # 工具名称
+	
 
 # 钢笔工具
 class PEN:

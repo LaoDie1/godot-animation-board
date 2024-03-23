@@ -121,3 +121,12 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 		_:
 			printerr("没有实现功能：", menu_path)
 
+
+func _on_image_layer_timeline_play_state_changed(state: Variant) -> void:
+	match state:
+		ImageLayerTimeline.PLAY_BACKWARD, \
+		ImageLayerTimeline.PLAY_FORWARD:
+			canvas_container.onionskin.visible = false
+		
+		ImageLayerTimeline.PAUSE:
+			canvas_container.onionskin.visible = ProjectData.get_config(PropertyName.TOOL.ONIONSKIN, false)

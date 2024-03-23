@@ -170,3 +170,4 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [connection signal="menu_pressed" from="MarginContainer/VBoxContainer/SimpleMenu" to="." method="_on_simple_menu_menu_pressed"]
+[connection signal="play_state_changed" from="MarginContainer/VBoxContainer/VSplitContainer/ImageLayerTimeline" to="." method="_on_image_layer_timeline_play_state_changed"]
