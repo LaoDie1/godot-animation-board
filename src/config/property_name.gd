@@ -10,9 +10,9 @@ class_name PropertyName
 
 
 class KEY:
-	static var TEXTURE
 	static var LAYER_ID
 	static var FRAME_ID
+	static var TEXTURE
 	static var COLORS
 
 
@@ -25,7 +25,3 @@ class PEN:
 class IMAGE:
 	static var RECT
 
-
-class TIMELINE:
-	static var LAYER_ID
-	static var FRAME_ID

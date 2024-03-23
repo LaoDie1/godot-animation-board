@@ -6,15 +6,14 @@
 # - version: 4.2.1
 #============================================================
 ## 图层
+##
+## 使用 Texture 进行绘制的原因是颜色多了不会卡顿
 class_name ImageLayer
 extends Control
 
 
-signal image_changed()
-
-
-var _last_layer_id : int 
-var _last_frame_id : int 
+var _last_layer_id
+var _last_frame_id
 var _image : Image
 var _image_texture : ImageTexture
 
@@ -41,7 +40,7 @@ func _draw() -> void:
 #  自定义
 #============================================================
 ## 加载数据
-func load_data(layer_id: int, frame_id: int):
+func load_data(layer_id: float, frame_id: float):
 	_last_layer_id = layer_id
 	_last_frame_id = frame_id
 	var data = ProjectData.get_image_data(layer_id, frame_id)
@@ -54,6 +53,7 @@ func load_data(layer_id: int, frame_id: int):
 ## 获取图像数据
 func get_image_texture() -> ImageTexture:
 	return _image_texture
+
 
 ## 设置颜色偏移
 func set_offset_colors(offset: Vector2i):
@@ -81,12 +81,12 @@ func set_offset_colors(offset: Vector2i):
 	# 更新
 	_image = new_image
 	_image_texture.update(_image)
-	image_changed.emit()
+	ProjectData.update_texture( _last_layer_id, _last_frame_id, _image_texture )
 	queue_redraw()
 
 
-## 根据数据设置颜色
-func set_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
+## 根据数据绘制颜色
+func draw_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 	if data.is_empty():
 		return
 	
@@ -99,17 +99,46 @@ func set_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 			if image_rect.has_point(point):
 				_image.set_pixelv(point, data[point])
 	else:
-		var visited : Dictionary = {}
 		var tmp_point : Vector2i
 		for point in data:
 			tmp_point = point + offset
-			if not visited.has(tmp_point) and image_rect.has_point(tmp_point):
+			if image_rect.has_point(tmp_point):
 				_image.set_pixelv(tmp_point, data[point])
-				visited[tmp_point] = null
-			image_colors[tmp_point] = data[point]
+				image_colors[tmp_point] = data[point]
 	
 	# 更新
 	_image_texture.update(_image)
-	image_changed.emit()
 	queue_redraw()
+
+
+## 根据 Texture2D 绘制颜色
+func draw_color_by_texture(texture: Texture2D, offset: Vector2i = Vector2i.ZERO):
+	var image = texture.get_image()
+	var image_colors : Dictionary = ProjectData.get_image_colors(_last_layer_id, _last_frame_id)
+	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	
+	var curr_image_size = image.get_size()
+	var color : Color
+	if offset == Vector2i.ZERO:
+		for x in curr_image_size.x:
+			for y in curr_image_size.y:
+				color = image.get_pixel(x, y)
+				_image.set_pixel(x, y, color)
+				image_colors[Vector2i(x, y)] = color
+	else:
+		var point : Vector2i
+		var tmp_point : Vector2i
+		for x in curr_image_size.x:
+			for y in curr_image_size.y:
+				point = Vector2i(x, y)
+				tmp_point = point + offset
+				if image_rect.has_point(tmp_point):
+					color = image.get_pixel(x, y)
+					_image.set_pixelv(tmp_point, color)
+					image_colors[tmp_point] = color
+	
+	# 更新
+	_image_texture.update(_image)
+	queue_redraw()
+
 

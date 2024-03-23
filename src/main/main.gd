@@ -74,14 +74,24 @@ func _init_menu():
 			{"Export": [ "PNG", "JPG"]},
 		],
 		"Edit": ["Undo", "Redo"],
+		"Layer": [
+			"Add Layer", "-", 
+			"Add Frame", "Add Frame To Front",
+		],
 	})
+	
 	menu.init_shortcut({
 		"/File/Open": {"keycode": KEY_O, "ctrl": true},
 		"/File/New": {"keycode": KEY_N, "ctrl": true},
 		"/File/Save": {"keycode": KEY_S, "ctrl": true},
 		"/File/Save As": {"keycode": KEY_S, "ctrl": true, "shift": true},
+		
 		"/Edit/Undo": {"keycode": KEY_Z, "ctrl": true},
 		"/Edit/Redo": {"keycode": KEY_Z, "ctrl": true, "shift": true},
+		
+		"/Layer/Add Frame": {"keycode": KEY_INSERT},
+		"/Layer/Add Frame To Front": {"keycode": KEY_INSERT, "shift": true},
+		
 	})
 	menu.set_menu_disabled_by_path("/Edit/Undo", true)
 	menu.set_menu_disabled_by_path("/Edit/Redo", true)
@@ -93,6 +103,10 @@ func _add_undo_redo(action_name: String, do_method: Callable, undo_method: Calla
 	_undo_redo.add_undo_method(undo_method)
 	_undo_redo.commit_action(execute_do)
 	menu.set_menu_disabled_by_path("/Edit/Undo", false)
+
+
+
+
 
 
 #============================================================
@@ -112,6 +126,17 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 			_undo_redo.redo()
 			menu.set_menu_disabled_by_path("/Edit/Undo", not _undo_redo.has_undo())
 			menu.set_menu_disabled_by_path("/Edit/Redo", not _undo_redo.has_redo())
+		
+		"/Layer/Add Layer":
+			ProjectData.new_layer()
+			
+		"/Layer/Add Frame":
+			ProjectData.new_frame()
+		
+		"/Layer/Add Frame To Front":
+			var current_frame_id = ProjectData.get_current_frame_id()
+			ProjectData.new_frame(ProjectData.DEFAULT_INT, current_frame_id)
+			ProjectData.update_current_frame(current_frame_id)
 		
 		_:
 			printerr("没有实现功能：", menu_path)
