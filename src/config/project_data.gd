@@ -50,8 +50,8 @@ func get_config(property, default = null):
 		_config_data[property] = default
 		return default
 
-## 监听这个属性的改变。监听的方法需要有两个参数，一个接收修改前的值，一个为当前的值
-func listen_property(property: String, method: Callable):
+## 监听这个配置的改变。监听的方法需要有两个参数，一个接收修改前的值，一个为当前的值
+func listen_config(property: String, method: Callable):
 	if not _listen_property_callback.has(property):
 		_listen_property_callback[property] = []
 	_listen_property_callback[property].append(method)
@@ -113,6 +113,83 @@ func get_stroke_points(size: int) -> Array:
 
 
 #============================================================
+#  菜单功能
+#============================================================
+signal new_file()
+
+var menu : SimpleMenu
+var undo_redo : UndoRedo = UndoRedo.new()
+
+func add_undo_redo(action_name: String, do_method: Callable, undo_method: Callable, execute_do: bool):
+	undo_redo.create_action(action_name)
+	undo_redo.add_do_method(do_method)
+	undo_redo.add_undo_method(undo_method)
+	undo_redo.commit_action(execute_do)
+	menu.set_menu_disabled_by_path("/Edit/Undo", false)
+
+func menu_new():
+	undo_redo.clear_history(true)
+	_auto_incr_frame_id = 0
+	_auto_incr_layer_id = 0
+	
+	_frame_ids.clear()
+	_layer_ids.clear()
+	_current_frame_point = 0
+	_layer_frame_to_image_data.clear()
+	_selected_layer_ids.clear()
+	_id_to_thumbnails.clear()
+	
+	new_file.emit()
+
+
+func menu_undo():
+	undo_redo.undo()
+	menu.set_menu_disabled_by_path("/Edit/Undo", not undo_redo.has_undo())
+	menu.set_menu_disabled_by_path("/Edit/Redo", not undo_redo.has_redo())
+
+func menu_redo():
+	undo_redo.redo()
+	menu.set_menu_disabled_by_path("/Edit/Undo", not undo_redo.has_undo())
+	menu.set_menu_disabled_by_path("/Edit/Redo", not undo_redo.has_redo())
+
+func menu_add_layer():
+	var layer_id = get_new_layer_id()
+	add_undo_redo(
+		"添加图层",
+		new_layer.bind(layer_id),
+		remove_layer.bind(layer_id),
+		true
+	)
+
+func menu_add_frame():
+	var frame_id = get_new_frame_id()
+	add_undo_redo(
+		"添加帧",
+		new_frame.bind(frame_id),
+		remove_frame.bind(frame_id),
+		true
+	)
+
+func menu_insert_frame():
+	var frame_id = get_current_frame_id()
+	var new_frame_id = get_new_frame_id(frame_id)
+	add_undo_redo(
+		"添加新的帧到前面",
+		__menu_add_frame_to_front_do.bind(frame_id, new_frame_id),
+		__menu_add_frame_to_front_undo.bind(frame_id, new_frame_id),
+		true
+	)
+
+func __menu_add_frame_to_front_do(frame_id, new_frame_id):
+	new_frame(new_frame_id, frame_id)
+	update_current_frame(frame_id)
+
+func __menu_add_frame_to_front_undo(frame_id, new_frame_id):
+	remove_frame(new_frame_id)
+	update_current_frame(frame_id)
+
+
+#============================================================
 #  项目数据
 #============================================================
 signal newly_layer(layer_id: float)
@@ -162,16 +239,32 @@ func get_max_frame_id() -> float:
 func get_layer_ids() -> Array:
 	return _layer_ids
 
+## 获取这个图层的顺序
+func get_layer_point(layer_id) -> int:
+	return _layer_ids.find(layer_id)
+
+## 获取图层数量
+func get_layer_count() -> int:
+	return _layer_ids.size()
+
+## 是否有这个图层
+func has_layer(layer_id) -> bool:
+	return _layer_ids.has(layer_id)
+
 ## 获取所有帧ID
 func get_frame_ids() -> Array:
 	return _frame_ids
 
 ## 获取动画帧数
-func get_frame_id_count() -> int:
+func get_frame_count() -> int:
 	return _frame_ids.size()
 
 func has_frame(frame_id: float) -> bool:
 	return _frame_ids.has(frame_id)
+
+func get_new_layer_id():
+	_auto_incr_layer_id += 1
+	return _auto_incr_layer_id
 
 ## 新的图层
 func new_layer(layer_id: float = DEFAULT_INT, insert_layer_front: float = DEFAULT_INT) -> float:
@@ -181,8 +274,7 @@ func new_layer(layer_id: float = DEFAULT_INT, insert_layer_front: float = DEFAUL
 	
 	if layer_id == DEFAULT_INT:
 		if insert_layer_front == DEFAULT_INT:
-			_auto_incr_layer_id += 1
-			layer_id = _auto_incr_layer_id
+			layer_id = get_new_layer_id()
 		else:
 			var map = {}
 			for id in _layer_ids:
@@ -215,30 +307,37 @@ func remove_layer(layer_id: float) -> bool:
 	if idx != -1:
 		_layer_ids.remove_at(idx)
 		removed_layer.emit(layer_id)
+		remove_select_layer(layer_id)
 		return true
 	return false
 
+func get_new_frame_id(insert_frame_front = DEFAULT_INT):
+	var frame_id
+	if insert_frame_front == DEFAULT_INT:
+		_auto_incr_frame_id += 1
+		frame_id = _auto_incr_frame_id
+	else:
+		var map = {}
+		for id in _frame_ids:
+			map[id] = null
+		frame_id = insert_frame_front
+		while true:
+			frame_id -= 0.001
+			if not map.has(frame_id):
+				break
+	return frame_id
+
+
 ## 新的动画帧
-func new_frame(frame_id = DEFAULT_INT, insert_frame_front = DEFAULT_INT) -> float:
+##[br]
+##[br][code]frame_id[/code]  这个帧的ID
+##[br][code]insert_frame_front[/code]  插入到这个帧的前面
+func new_frame(frame_id, insert_frame_front = DEFAULT_INT) -> float:
 	if _frame_ids.has(frame_id):
 		push_error("已添加过这个ID")
 		return frame_id
 	
 	# 记录数据
-	if frame_id == DEFAULT_INT:
-		if insert_frame_front == DEFAULT_INT:
-			_auto_incr_frame_id += 1
-			frame_id = _auto_incr_frame_id
-		else:
-			var map = {}
-			for id in _frame_ids:
-				map[id] = null
-			frame_id = insert_frame_front - 1
-			while true:
-				frame_id += 0.001
-				if not map.has(frame_id):
-					break
-	
 	if insert_frame_front == DEFAULT_INT:
 		_frame_ids.append(frame_id)
 	else:
@@ -257,6 +356,8 @@ func remove_frame(frame_id: float) -> bool:
 	var idx = _frame_ids.find(frame_id)
 	if idx != -1:
 		_frame_ids.remove_at(idx)
+		if idx == _current_frame_point:
+			update_current_frame(_frame_ids[idx - 1])
 		removed_frame.emit(frame_id)
 		return true
 	return false
@@ -291,24 +392,24 @@ func new_texture(layer_id: float, frame_id: float, texture: ImageTexture = null)
 func update_texture(layer_id: float, frame_id: float, texture: ImageTexture):
 	var data = get_image_data(layer_id, frame_id)
 	data[PropertyName.KEY.TEXTURE] = texture
-	var id = "%d,%d" % [layer_id, frame_id]
 	_update_thumbnails(layer_id, frame_id, texture)
 	texture_changed.emit(layer_id, frame_id, texture)
 
-func _update_thumbnails(layer_id: float, frame_id: float, texture: ImageTexture):
-	var id = "%d,%d" % [layer_id, frame_id]
-	var _texture := get_image_texture(layer_id, frame_id).duplicate(true) as ImageTexture
-	_texture.set_size_override( THUMBNAILS_SIZE )
-	_id_to_thumbnails[ id ] = _texture
+func _update_thumbnails(layer_id: float, frame_id: float, texture: ImageTexture = null):
+	if texture == null:
+		texture = get_image_texture(layer_id, frame_id).duplicate(true)
+	else:
+		texture = texture.duplicate(true)
+	texture.set_size_override( THUMBNAILS_SIZE )
+	if not _id_to_thumbnails.has(layer_id):
+		_id_to_thumbnails[layer_id] = {}
+	_id_to_thumbnails[layer_id][frame_id] = texture
 
 ## 获取缩略图
 func get_thumbnails(layer_id: float, frame_id: float) -> ImageTexture:
-	var id = "%d,%d" % [layer_id, frame_id]
-	#var id = "%d,%d,%s" % [layer_id, frame_id, size]
-	if not _id_to_thumbnails.has(id):
-		var texture = get_image_texture(layer_id, frame_id).duplicate(true)
-		_update_thumbnails(layer_id, frame_id, texture)
-	return _id_to_thumbnails[id]
+	if not _id_to_thumbnails.has(layer_id) or not _id_to_thumbnails[layer_id].has(frame_id):
+		_update_thumbnails(layer_id, frame_id)
+	return _id_to_thumbnails[layer_id][frame_id]
 
 ## 添加选中的层
 func add_select_layer(layer_id: float) -> bool:
@@ -348,16 +449,28 @@ func get_select_layer_ids() -> Array:
 
 ## 更新当前帧
 func update_current_frame(frame_id: float):
+	update_current_frame_by_point(_frame_ids.find(frame_id))
+
+## 更新当前帧
+func update_current_frame_by_point(point: int):
+	if point == -1:
+		return
 	var last_frame_idx = _current_frame_point
-	_current_frame_point = _frame_ids.find(frame_id)
-	frame_changed.emit(_frame_ids[last_frame_idx], _frame_ids[_current_frame_point])
+	_current_frame_point = point
+	if last_frame_idx < _frame_ids.size():
+		frame_changed.emit(_frame_ids[last_frame_idx], _frame_ids[_current_frame_point])
+	else:
+		frame_changed.emit(_frame_ids.front(), _frame_ids[_current_frame_point])
 
 ## 获取当前帧ID
 func get_current_frame_id():
 	return _frame_ids[_current_frame_point]
 
+func get_frame_id(idx: int) -> float:
+	return _frame_ids[idx]
+
 ## 获取当前帧的ID索引
-func get_current_frame_point():
+func get_current_frame_point() -> int:
 	return _current_frame_point
 
 ## 获取当前帧的这一层的图像数据

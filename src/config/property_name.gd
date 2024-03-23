@@ -9,6 +9,7 @@
 class_name PropertyName
 
 
+# 配置数据相关。Dictionary 中的数据的键
 class KEY:
 	static var LAYER_ID
 	static var FRAME_ID
@@ -16,8 +17,11 @@ class KEY:
 	static var COLORS
 
 
+# 工具数据
 class TOOL:
 	static var CURRENT # 当前工具
+	static var PEN
+	static var ONIONSKIN # 洋葱皮
 
 # 钢笔工具
 class PEN:

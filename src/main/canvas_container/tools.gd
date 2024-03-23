@@ -18,6 +18,8 @@ func set_input_board(input_board):
 
 
 func active_tool(tool_name: String):
+	if tool_name.begins_with("/"):
+		tool_name = tool_name.get_file()
 	var tool = get_tool(tool_name)
 	if tool == _current_tool:
 		return

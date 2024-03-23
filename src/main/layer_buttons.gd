@@ -26,7 +26,29 @@ func _init() -> void:
 			ProjectData.clear_select_layer()
 			ProjectData.add_select_layers([layer_id])
 	)
-	ProjectData.newly_layer.connect(create_layer)
+	ProjectData.newly_layer.connect(func(layer_id):
+		if _layer_id_to_layer_data.has(layer_id):
+			return
+		if not _layer_id_to_layer_data.has(layer_id):
+			# 创建相关数据
+			var data : Dictionary = {}
+			data["layer_id"] = layer_id
+			data["name"] = "Layer %d" % layer_id
+			var button = _create_layer_node(data["name"])
+			data["node"] = button
+			button.set_meta(META_KEY_ID, layer_id)
+			# 记录
+			_layer_id_to_layer_data[layer_id] = data
+		else:
+			var button = _layer_id_to_layer_data[layer_id]["node"]
+			add_child(button)
+	)
+	ProjectData.removed_layer.connect(
+		func(layer_id):
+			var data = _layer_id_to_layer_data[layer_id]
+			var button = data["node"]
+			button.get_parent().remove_child(button)
+	)
 	ProjectData.select_layers_changed.connect(
 		func():
 			var layers_ids = ProjectData.get_select_layer_ids()
@@ -55,20 +77,6 @@ func _create_layer_node(b_name: String) -> Control:
 
 func get_layer_data(layer_id: float) -> Dictionary:
 	return _layer_id_to_layer_data.get(layer_id, {})
-
-func create_layer(layer_id: float) -> bool:
-	if _layer_id_to_layer_data.has(layer_id):
-		return false
-	# 创建相关数据
-	var data : Dictionary = {}
-	data["layer_id"] = layer_id
-	data["name"] = "Layer %d" % layer_id
-	var button = _create_layer_node(data["name"])
-	data["node"] = button
-	button.set_meta(META_KEY_ID, layer_id)
-	# 记录
-	_layer_id_to_layer_data[layer_id] = data
-	return true
 
 func select_layer(layer_id: float):
 	get_layer_data(layer_id)["node"].button_pressed = true

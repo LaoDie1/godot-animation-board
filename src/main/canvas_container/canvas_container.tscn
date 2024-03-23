@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://d4in7v80fs4g5"]
+[gd_scene load_steps=8 format=3 uid="uid://d4in7v80fs4g5"]
 
 [ext_resource type="Script" path="res://src/main/canvas_container/canvas_container.gd" id="1_pvtiu"]
+[ext_resource type="Script" path="res://src/main/canvas_container/onionskin.gd" id="2_yoelk"]
 [ext_resource type="Script" path="res://src/main/canvas_container/tool/pen.gd" id="3_nf0la"]
 [ext_resource type="Script" path="res://src/main/canvas_container/tools.gd" id="3_s7dgr"]
 [ext_resource type="Script" path="res://src/main/canvas_container/input_board.gd" id="3_wuo3d"]
@@ -40,12 +41,18 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="Onionskin" type="Control" parent="ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_yoelk")
+frame_range = 3
+
 [node name="InputBoard" type="Control" parent="ScrollContainer/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_wuo3d")
 
-[node name="move_image_ref" type="ReferenceRect" parent="."]
+[node name="MoveImageRef" type="ReferenceRect" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
 offset_right = 100.0

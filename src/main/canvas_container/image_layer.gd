@@ -85,6 +85,12 @@ func set_offset_colors(offset: Vector2i):
 	queue_redraw()
 
 
+func _update_image():
+	_image_texture.update(_image)
+	ProjectData.update_texture( _last_layer_id, _last_frame_id, _image_texture)
+	queue_redraw()
+
+
 ## 根据数据绘制颜色
 func draw_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 	if data.is_empty():
@@ -107,8 +113,7 @@ func draw_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 				image_colors[tmp_point] = data[point]
 	
 	# 更新
-	_image_texture.update(_image)
-	queue_redraw()
+	_update_image()
 
 
 ## 根据 Texture2D 绘制颜色
@@ -138,7 +143,6 @@ func draw_color_by_texture(texture: Texture2D, offset: Vector2i = Vector2i.ZERO)
 					image_colors[tmp_point] = color
 	
 	# 更新
-	_image_texture.update(_image)
-	queue_redraw()
+	_update_image()
 
 

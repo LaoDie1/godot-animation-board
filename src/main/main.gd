@@ -14,9 +14,7 @@ extends Control
 @onready var layer_buttons: LayerButtons = %LayerButtons
 @onready var tool_button_container: BoxContainer = %tool_button_container
 @onready var image_layer_timeline: ImageLayerTimeline = %ImageLayerTimeline
-
-
-var _undo_redo : UndoRedo = UndoRedo.new()
+@onready var current_frame_label: Label = %CurrentFrameLabel
 
 
 #============================================================
@@ -26,19 +24,27 @@ func _init() -> void:
 	# 切换帧
 	ProjectData.frame_changed.connect(
 		func(last_frame_id, frame_id):
-			# 更新上一次的帧和层数据
-			for layer_id in ProjectData.get_layer_ids():
-				var image_layer : ImageLayer = canvas_container.get_image_layer(layer_id)
-				var texture = image_layer.get_image_texture()
-				ProjectData.update_texture(layer_id, last_frame_id, texture)
+			current_frame_label.text = " Frame ID: %s" % str(frame_id)
 			
 			# 加载当前帧和层的数据
 			for layer_id in ProjectData.get_layer_ids():
 				var data : Dictionary = ProjectData.get_image_data(layer_id, frame_id)
 				var image_layer : ImageLayer = canvas_container.get_image_layer(layer_id)
 				image_layer.load_data(layer_id, frame_id)
+			
 	)
-	
+	# 新文件
+	ProjectData.new_file.connect(
+		func():
+			# 创建图层
+			var frame_id = ProjectData.get_new_frame_id()
+			ProjectData.new_frame(frame_id)
+			ProjectData.new_layer()
+			# 选中图层1
+			layer_buttons.select_layer(1)
+			
+			current_frame_label.text = " Frame ID: %s" % str(ProjectData.get_current_frame_id())
+	)
 
 
 func _ready() -> void:
@@ -57,16 +63,13 @@ func _ready() -> void:
 	)
 	tool_button_container.get_child(0).button_pressed = true
 	
-	# 创建图层
-	ProjectData.new_frame()
-	ProjectData.new_layer()
-	# 选中图层1
-	layer_buttons.select_layer(1)
+	# 新建文件
+	ProjectData.menu_new()
 
 
 
 #============================================================
-#  自定义
+#  菜单
 #============================================================
 func _init_menu():
 	menu.init_menu({
@@ -77,7 +80,7 @@ func _init_menu():
 		"Edit": ["Undo", "Redo"],
 		"Layer": [
 			"Add Layer", "-", 
-			"Add Frame", "Add Frame To Front",
+			"Add Frame", "Insert Frame",
 		],
 	})
 	
@@ -91,22 +94,13 @@ func _init_menu():
 		"/Edit/Redo": {"keycode": KEY_Z, "ctrl": true, "shift": true},
 		
 		"/Layer/Add Frame": {"keycode": KEY_INSERT},
-		"/Layer/Add Frame To Front": {"keycode": KEY_INSERT, "shift": true},
+		"/Layer/Insert Frame": {"keycode": KEY_INSERT, "shift": true},
 		
 	})
+	
+	ProjectData.menu = menu
 	menu.set_menu_disabled_by_path("/Edit/Undo", true)
 	menu.set_menu_disabled_by_path("/Edit/Redo", true)
-
-
-func _add_undo_redo(action_name: String, do_method: Callable, undo_method: Callable, execute_do: bool = true):
-	_undo_redo.create_action(action_name)
-	_undo_redo.add_do_method(do_method)
-	_undo_redo.add_undo_method(undo_method)
-	_undo_redo.commit_action(execute_do)
-	menu.set_menu_disabled_by_path("/Edit/Undo", false)
-
-
-
 
 
 
@@ -117,28 +111,13 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 	match menu_path:
 		#"/File/Save":
 			#pass
-		#
-		"/Edit/Undo":
-			_undo_redo.undo()
-			menu.set_menu_disabled_by_path("/Edit/Undo", not _undo_redo.has_undo())
-			menu.set_menu_disabled_by_path("/Edit/Redo", not _undo_redo.has_redo())
+		"/File/New": ProjectData.menu_new()
+		"/Edit/Undo": ProjectData.menu_undo()
+		"/Edit/Redo": ProjectData.menu_redo()
+		"/Layer/Add Layer": ProjectData.menu_add_layer()
+		"/Layer/Add Frame": ProjectData.menu_add_frame()
+		"/Layer/Insert Frame": ProjectData.menu_insert_frame()
 			
-		"/Edit/Redo":
-			_undo_redo.redo()
-			menu.set_menu_disabled_by_path("/Edit/Undo", not _undo_redo.has_undo())
-			menu.set_menu_disabled_by_path("/Edit/Redo", not _undo_redo.has_redo())
-		
-		"/Layer/Add Layer":
-			ProjectData.new_layer()
-			
-		"/Layer/Add Frame":
-			ProjectData.new_frame()
-		
-		"/Layer/Add Frame To Front":
-			var current_frame_id = ProjectData.get_current_frame_id()
-			ProjectData.new_frame(ProjectData.DEFAULT_INT, current_frame_id)
-			ProjectData.update_current_frame(current_frame_id)
-		
 		_:
 			printerr("没有实现功能：", menu_path)
 

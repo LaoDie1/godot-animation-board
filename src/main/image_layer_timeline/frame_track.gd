@@ -33,7 +33,7 @@ var _frame_image_size : int = 40
 
 static var frame_board_color: Color = Color(1, 1, 1, 0.5)
 static var select_frame_color: Color = Color(1, 1, 1, 0.1)
-static var select_layer_color: Color = Color(1, 1, 1, 0.9)
+static var select_layer_color: Color = Color.PALE_GOLDENROD
 
 
 #============================================================
@@ -45,15 +45,23 @@ func _init() -> void:
 		func(frame_id: float):
 			queue_redraw()
 	)
-	ProjectData.frame_changed.connect(
-		func(last_frame_id: float, frame_id: float):
-			queue_redraw()
+	ProjectData.texture_changed.connect(
+		func(layer_id, frame_id, texture):
+			if layer_id == self.layer_id:
+				queue_redraw()
 	)
 
 
 func _draw() -> void:
-	if layer_id == 0:
+	if not ProjectData.has_layer(layer_id):
 		return
+	
+	var offset_p = Vector2()
+	offset_p.x = ProjectData.get_current_frame_point() * SPACE_WIDTH + 1
+	
+	# 高亮编辑的层
+	if ProjectData.is_select_layer(layer_id):
+		draw_rect( Rect2(offset_p, Vector2(40, 40) - Vector2(1,1)), select_layer_color, true)
 	
 	# 绘制缩略图
 	var count : int = ceili((size.x-_frame_image_size) / 24)
@@ -74,22 +82,18 @@ func _draw() -> void:
 			break
 	
 	# 绘制帧边框
-	var offset_p = Vector2()
-	offset_p.x = ProjectData.get_current_frame_point() * SPACE_WIDTH + 1
 	draw_rect( Rect2(offset_p, Vector2(40, 40) - Vector2(1,1)), select_frame_color, true)
 	
-	# 高亮编辑的层
-	if ProjectData.is_select_layer(layer_id):
-		draw_rect( Rect2(offset_p, Vector2(40, 40) - Vector2(1,1)), select_layer_color, true)
 
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			var idx = int(get_local_mouse_position().x / SPACE_WIDTH) + offset_frame
-			if idx < ProjectData.get_frame_id_count():
+			if idx < ProjectData.get_frame_count():
 				var frame_id = ProjectData.get_frame_ids()[idx]
-				# 更新当前的帧位置
-				ProjectData.update_current_frame(frame_id)
-				clicked_frame.emit(frame_id)
+				if ProjectData.has_frame(frame_id):
+					# 更新当前的帧位置
+					ProjectData.update_current_frame(frame_id)
+					clicked_frame.emit(frame_id)
 
