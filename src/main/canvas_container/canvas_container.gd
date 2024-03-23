@@ -130,28 +130,10 @@ func draw_by_texture(texture: Texture2D) -> void:
 		get_image_layer(layer_id).draw_color_by_texture(texture)
 
 
+
 #============================================================
-#  连接信号
+#  撤销重做绘制
 #============================================================
-func _on_move_ready_move() -> void:
-	move_image_ref.position = Vector2(0, 0)
-	move_image_ref.size = ProjectData.get_config(PropertyName.IMAGE.RECT).size
-	move_image_ref.visible = true
-
-
-func _on_move_move_position(last_point: Vector2i, current_point: Vector2i) -> void:
-	var offset : Vector2 = Vector2(current_point - input_board.get_last_pressed_point())
-	move_image_ref.position = offset
-
-
-func _on_move_move_finished() -> void:
-	move_image_ref.visible = false
-	var offset : Vector2 = Vector2(input_board.get_last_release_point() - input_board.get_last_pressed_point())
-	if offset != Vector2.ZERO:
-		for layer_id in ProjectData.get_select_layer_ids():
-			get_image_layer(layer_id).set_offset_colors(offset)
-
-
 # 当前画板的颜色
 func _get_draw_colors_data() -> Dictionary:
 	var colors_data = {}
@@ -176,7 +158,6 @@ func _get_current_layer_textures() -> Dictionary:
 var _layer_id_to_before_colors : Dictionary = {}
 var _layer_id_to_before_texture : Dictionary = {}
 
-
 # 绘制颜色数据。这个会记录修改后的数据，所以调用前先修改好数据在调用这个方法
 func draw_colors_data(colors_data: Dictionary):
 	var layer_id_to_textures = _get_current_layer_textures()
@@ -184,7 +165,7 @@ func draw_colors_data(colors_data: Dictionary):
 	var select_layer_ids = ProjectData.get_select_layer_ids()
 	ProjectData.add_undo_redo(
 		"绘制",
-		__draw_colors.bind(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids),
+		__draw_colors.bind(colors_data.duplicate(), layer_id_to_textures, current_frame_id, select_layer_ids),
 		__draw_colors.bind(_layer_id_to_before_colors.duplicate(), _layer_id_to_before_texture.duplicate(), current_frame_id, select_layer_ids),
 		false
 	)
@@ -201,6 +182,29 @@ func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_l
 		ProjectData.update_texture( layer_id, current_frame_id, layer_id_to_textures[layer_id])
 		var image_layer : ImageLayer = get_image_layer(layer_id)
 		image_layer.load_data(layer_id, current_frame_id)
+
+
+
+#============================================================
+#  连接信号
+#============================================================
+func _on_move_ready_move() -> void:
+	move_image_ref.position = Vector2(0, 0)
+	move_image_ref.size = ProjectData.get_config(PropertyName.IMAGE.RECT).size
+	move_image_ref.visible = true
+
+
+func _on_move_move_position(last_point: Vector2i, current_point: Vector2i) -> void:
+	var offset : Vector2 = Vector2(current_point - input_board.get_last_pressed_point())
+	move_image_ref.position = offset
+
+
+func _on_move_move_finished() -> void:
+	move_image_ref.visible = false
+	var offset : Vector2 = Vector2(input_board.get_last_release_point() - input_board.get_last_pressed_point())
+	if offset != Vector2.ZERO:
+		for layer_id in ProjectData.get_select_layer_ids():
+			get_image_layer(layer_id).set_offset_colors(offset)
 
 
 func _ready_draw() -> void:

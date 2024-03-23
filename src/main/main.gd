@@ -37,7 +37,7 @@ func _init() -> void:
 	ProjectData.new_file.connect(
 		func():
 			# 创建图层
-			var frame_id = ProjectData.get_new_frame_id()
+			var frame_id = ProjectData.create_new_frame_id()
 			ProjectData.new_frame(frame_id)
 			ProjectData.new_layer()
 			# 选中图层1
