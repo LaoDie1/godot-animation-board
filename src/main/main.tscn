@@ -1,9 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://c2ch44wucrt8m"]
+[gd_scene load_steps=11 format=3 uid="uid://c2ch44wucrt8m"]
 
 [ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
 [ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
 [ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/canvas_container/canvas_container.tscn" id="3_3liki"]
-[ext_resource type="Script" path="res://src/config/project_data.gd" id="5_iwf0a"]
 [ext_resource type="Script" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
 [ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/pen_setting.tscn" id="6_ge575"]
 [ext_resource type="PackedScene" uid="uid://ccvi3ga25277e" path="res://src/main/image_layer_timeline/image_layer_timeline.tscn" id="7_i4wsq"]
@@ -33,10 +32,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_46xse")
-
-[node name="ConfigData" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("5_iwf0a")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

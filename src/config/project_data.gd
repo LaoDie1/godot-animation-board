@@ -143,6 +143,10 @@ func get_layer_ids() -> Array:
 func get_frame_ids() -> Array:
 	return _frame_ids.keys()
 
+## 获取动画帧数
+func get_frame_id_count() -> int:
+	return _frame_ids.size()
+
 func has_frame(frame_id: int) -> bool:
 	return _frame_ids.has(frame_id)
 

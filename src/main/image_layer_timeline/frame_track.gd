@@ -39,9 +39,6 @@ static var select_layer_color: Color = Color(1, 1, 1, 0.9)
 #============================================================
 func _init() -> void:
 	clip_contents = true
-
-
-func _ready() -> void:
 	ProjectData.newly_frame.connect(
 		func(frame_id):
 			queue_redraw()
@@ -83,6 +80,7 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			var frame_id = int(get_local_mouse_position().x / (24 * 2)) + 1
-			ProjectData.update_current_frame(frame_id)
-			clicked_frame.emit(frame_id)
+			if frame_id <= ProjectData.get_frame_id_count():
+				ProjectData.update_current_frame(frame_id)
+				clicked_frame.emit(frame_id)
 
