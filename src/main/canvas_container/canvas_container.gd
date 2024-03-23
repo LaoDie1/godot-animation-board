@@ -32,8 +32,8 @@ func _init() -> void:
 
 func _ready() -> void:
 	# 图像大小
-	var image_size = ProjectData.get_config(PropertyName.IMAGE.SIZE, Vector2i(100, 100))
-	_config_changed(PropertyName.IMAGE.SIZE, image_size, image_size )
+	var image_size : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	_config_changed(PropertyName.IMAGE.RECT, image_size, image_size )
 	
 	# 图层
 	move_image_ref.visible = false
@@ -57,13 +57,15 @@ func _process(delta: float) -> void:
 #============================================================
 #  自定义
 #============================================================
-func _config_changed(property, last_value, image_size):
-	if property == PropertyName.IMAGE.SIZE:
+func _config_changed(property, last_rect, image_rect):
+	if property == PropertyName.IMAGE.RECT:
+		var last_image_size : Vector2i = last_rect.size
+		var image_size : Vector2i = image_rect.size
 		var max_size : Vector2i 
-		if typeof(last_value) != TYPE_NIL:
+		if typeof(last_image_size) != TYPE_NIL:
 			max_size = Vector2i(
-				max(last_value.x, image_size.x),
-				max(last_value.y, image_size.y),
+				max(last_image_size.x, image_size.x),
+				max(last_image_size.y, image_size.y),
 			)
 		else:
 			max_size = image_size
@@ -86,7 +88,7 @@ func create_layer(layer_id: int):
 	var image_layer : ImageLayer = ImageLayer.new()
 	image_layer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	image_layer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	image_layer.load_data( ProjectData.get_image_data_by_current_frame(layer_id) )
+	image_layer.load_data( layer_id, ProjectData.get_current_frame() )
 	image_layers.add_child(image_layer)
 	# 记录
 	_id_to_layer_node[layer_id] = image_layer
@@ -106,7 +108,7 @@ func update_canvas():
 		for layer_id in ProjectData.get_layer_ids():
 			var image_layer = get_image_layer(layer_id)
 			var data = ProjectData.get_image_data(layer_id, frame_id)
-			image_layer.load_data(data)
+			image_layer.load_data( layer_id, frame_id )
 
 func draw_by_data(data: Dictionary) -> void:
 	# 添加到队列进行绘制，防止卡顿
@@ -119,7 +121,7 @@ func draw_by_data(data: Dictionary) -> void:
 #============================================================
 func _on_move_ready_move() -> void:
 	move_image_ref.position = Vector2(0, 0)
-	move_image_ref.size = ProjectData.get_config(PropertyName.IMAGE.SIZE)
+	move_image_ref.size = ProjectData.get_config(PropertyName.IMAGE.RECT).size
 	move_image_ref.visible = true
 
 
@@ -131,11 +133,13 @@ func _on_move_move_position(last_point: Vector2i, current_point: Vector2i) -> vo
 func _on_move_move_finished() -> void:
 	move_image_ref.visible = false
 	var offset : Vector2 = Vector2(input_board.get_last_release_point() - input_board.get_last_pressed_point())
-	for layer_id in ProjectData.get_select_layer_ids():
-		get_image_layer(layer_id).set_offset_colors(offset)
-		var texture = get_image_layer(layer_id).get_image_texture()
-		
-		ProjectData.update_texture( layer_id, ProjectData.get_current_frame(), texture )
+	if offset != Vector2.ZERO:
+		for layer_id in ProjectData.get_select_layer_ids():
+			
+			
+			get_image_layer(layer_id).set_offset_colors(offset)
+			var texture = get_image_layer(layer_id).get_image_texture()
+			ProjectData.update_texture( layer_id, ProjectData.get_current_frame(), texture )
 
 
 func _on_pen_draw_finished() -> void:

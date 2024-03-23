@@ -97,6 +97,7 @@ signal texture_changed(layer_id: int, frame_id: int)
 signal select_layers_changed()
 
 
+var _image_rect: Rect2i = Rect2i()
 var _current_frame : int = 1
 var _auto_incr_layer_id : int = 0
 var _auto_incr_frame_id : int = 0
@@ -118,6 +119,15 @@ func get_image_data(layer_id: int, frame_id: int) -> Dictionary:
 func get_image_texture(layer_id: int, frame_id: int) -> ImageTexture:
 	var data : Dictionary = get_image_data(layer_id, frame_id)
 	return data[PropertyName.KEY.TEXTURE]
+
+## 获取这个图像的颜色
+func get_image_colors(layer_id: int, frame_id: int) -> Dictionary:
+	var data : Dictionary = get_image_data(layer_id, frame_id)
+	return data[PropertyName.KEY.COLORS]
+
+func update_image_colors(layer_id: int, frame_id: int, colors: Dictionary):
+	var data : Dictionary = get_image_data(layer_id, frame_id)
+	data[PropertyName.KEY.COLORS] = colors
 
 func get_max_layer_id() -> int:
 	return _auto_incr_layer_id
@@ -160,7 +170,7 @@ func new_frame() -> int:
 
 ## 添加新的图片
 func new_texture(layer_id: int, frame_id: int, texture: ImageTexture = null):
-	var image_size : Vector2i = get_config(PropertyName.IMAGE.SIZE)
+	var image_size : Vector2i = get_config(PropertyName.IMAGE.RECT).size
 	if texture == null:
 		var image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
 		texture = ImageTexture.create_from_image(image)
@@ -168,9 +178,11 @@ func new_texture(layer_id: int, frame_id: int, texture: ImageTexture = null):
 		PropertyName.KEY.LAYER_ID: layer_id,
 		PropertyName.KEY.FRAME_ID: frame_id,
 		PropertyName.KEY.TEXTURE: texture,
+		PropertyName.KEY.COLORS: {},
 	}
 	_layer_frame_to_image_data[layer_id][frame_id] = data
 	add_image_data(layer_id, frame_id, data)
+
 
 ## 更新贴图数据
 func update_texture(layer_id: int, frame_id: int, texture: ImageTexture):
@@ -242,4 +254,3 @@ func get_current_frame() -> int:
 
 func get_image_data_by_current_frame(layer_id: int) -> Dictionary:
 	return get_image_data(layer_id, _current_frame)
-

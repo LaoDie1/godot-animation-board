@@ -13,6 +13,7 @@ class KEY:
 	static var TEXTURE
 	static var LAYER_ID
 	static var FRAME_ID
+	static var COLORS
 
 
 # 钢笔工具
@@ -22,7 +23,7 @@ class PEN:
 
 # 图片
 class IMAGE:
-	static var SIZE
+	static var RECT
 
 
 class TIMELINE:

@@ -23,7 +23,7 @@ var _undo_redo : UndoRedo = UndoRedo.new()
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.set_config(PropertyName.IMAGE.SIZE, Vector2i(500, 500))
+	ProjectData.set_config(PropertyName.IMAGE.RECT, Rect2i(0, 0, 500, 500))
 	# 切换帧
 	ProjectData.frame_changed.connect(
 		func(last_frame_id, frame_id):
@@ -37,7 +37,7 @@ func _init() -> void:
 			for layer_id in ProjectData.get_layer_ids():
 				var data : Dictionary = ProjectData.get_image_data(layer_id, frame_id)
 				var image_layer : ImageLayer = canvas_container.get_image_layer(layer_id)
-				image_layer.load_data(data)
+				image_layer.load_data(layer_id, frame_id)
 	)
 	
 
