@@ -15,7 +15,7 @@ signal pressed()
 ## 点击移动
 signal press_move(last_point: Vector2i, current_point: Vector2i)
 ## 松开
-signal release()
+signal released()
 
 
 var _pressed : bool = false # 是否正在按下
@@ -44,7 +44,7 @@ func _gui_input(event: InputEvent) -> void:
 				pressed.emit()
 			else:
 				_release_point = Vector2i(get_local_mouse_position())
-				release.emit()
+				released.emit()
 
 
 #============================================================

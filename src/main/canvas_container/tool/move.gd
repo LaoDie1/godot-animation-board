@@ -25,6 +25,6 @@ func _press_move(last_point: Vector2i, current_point: Vector2i):
 	move_position.emit(last_point, current_point)
 
 
-func _release():
+func _released():
 	move_finished.emit()
 

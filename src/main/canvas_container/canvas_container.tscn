@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d4in7v80fs4g5"]
+[gd_scene load_steps=9 format=3 uid="uid://d4in7v80fs4g5"]
 
 [ext_resource type="Script" path="res://src/main/canvas_container/canvas_container.gd" id="1_pvtiu"]
 [ext_resource type="Script" path="res://src/main/canvas_container/onionskin.gd" id="2_yoelk"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/main/canvas_container/input_board.gd" id="3_wuo3d"]
 [ext_resource type="Script" path="res://src/main/canvas_container/tool/move.gd" id="4_y3iy2"]
 [ext_resource type="Script" path="res://src/main/canvas_container/tool/eraser.gd" id="6_uu5ft"]
+[ext_resource type="Script" path="res://src/main/canvas_container/tool/line.gd" id="8_vcteg"]
 
 [node name="CanvasContainer" type="Control"]
 texture_filter = 1
@@ -74,6 +75,9 @@ script = ExtResource("6_uu5ft")
 [node name="move" type="Node" parent="tools"]
 script = ExtResource("4_y3iy2")
 
+[node name="line" type="Node" parent="tools"]
+script = ExtResource("8_vcteg")
+
 [connection signal="draw_finished" from="tools/pen" to="." method="_draw_finished"]
 [connection signal="drawn" from="tools/pen" to="." method="draw_by_data"]
 [connection signal="ready_draw" from="tools/pen" to="." method="_ready_draw"]
@@ -83,3 +87,5 @@ script = ExtResource("4_y3iy2")
 [connection signal="move_finished" from="tools/move" to="." method="_on_move_move_finished"]
 [connection signal="move_position" from="tools/move" to="." method="_on_move_move_position"]
 [connection signal="ready_move" from="tools/move" to="." method="_on_move_ready_move"]
+[connection signal="pressed" from="tools/line" to="." method="_ready_draw"]
+[connection signal="released" from="tools/line" to="." method="_on_line_released"]

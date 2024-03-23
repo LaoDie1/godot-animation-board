@@ -48,9 +48,9 @@ func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
 			if not _drawn_points_color.has(tmp_p) and image_rect.has_point(tmp_p):
 				_drawn_points_color[tmp_p] = pen_color
 				draw_data[tmp_p] = pen_color
-		if not draw_data.is_empty():
-			drawn.emit(draw_data)
+	if not draw_data.is_empty():
+		drawn.emit(draw_data)
 
 
-func _release():
+func _released():
 	draw_finished.emit()

@@ -89,7 +89,7 @@ size_flags_horizontal = 3
 focus_mode = 0
 toggle_mode = true
 shortcut = SubResource("Shortcut_o7n6u")
-text = "pen"
+text = "Pen"
 
 [node name="eraser" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
 layout_mode = 2
@@ -97,7 +97,7 @@ size_flags_horizontal = 3
 focus_mode = 0
 toggle_mode = true
 shortcut = SubResource("Shortcut_o7n6u")
-text = "eraser"
+text = "Eraser"
 
 [node name="move" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
 layout_mode = 2
@@ -105,7 +105,15 @@ size_flags_horizontal = 3
 focus_mode = 0
 toggle_mode = true
 shortcut = SubResource("Shortcut_3im42")
-text = "move"
+text = "Move"
+
+[node name="line" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+shortcut = SubResource("Shortcut_3im42")
+text = "Line"
 
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
 layout_mode = 2

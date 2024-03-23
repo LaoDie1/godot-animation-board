@@ -36,3 +36,6 @@ class ERASER:
 class IMAGE:
 	static var RECT
 
+class LINE:
+	static var WIDTH # 线宽
+	static var COLOR

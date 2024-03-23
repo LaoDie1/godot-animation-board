@@ -23,19 +23,22 @@ var image_rect : Rect2i
 func get_last_pressed_point() -> Vector2i:
 	return input_board.get_last_pressed_point()
 
+func get_current_point() -> Vector2i:
+	return Vector2i(input_board.get_local_mouse_position())
+
 
 ## 激活工具
 func active():
 	input_board.pressed.connect(_pressed)
 	input_board.press_move.connect(_press_move)
-	input_board.release.connect(_release)
+	input_board.released.connect(_released)
 
 
 ## 取消激活工具
 func deactive():
 	input_board.pressed.disconnect(_pressed)
 	input_board.press_move.disconnect(_press_move)
-	input_board.release.disconnect(_release)
+	input_board.released.disconnect(_released)
 
 
 
@@ -50,5 +53,5 @@ func _press_move(last_point: Vector2i, current_point: Vector2i):
 	pass
 
 
-func _release():
+func _released():
 	pass

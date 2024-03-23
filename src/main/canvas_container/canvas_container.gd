@@ -151,6 +151,7 @@ func _on_move_move_finished() -> void:
 			get_image_layer(layer_id).set_offset_colors(offset)
 
 
+# 当前画板的颜色
 func _get_draw_colors_data() -> Dictionary:
 	var colors_data = {}
 	# 记录绘制前的颜色数据
@@ -162,49 +163,59 @@ func _get_draw_colors_data() -> Dictionary:
 			colors_data[layer_id][frame_id] = colors.duplicate()
 	return colors_data
 
-func _get_layer_id_to_textures() -> Dictionary:
+# 当前层级对应的图片
+func _get_current_layer_textures() -> Dictionary:
 	var layer_id_to_textures = {}
 	for layer_id in ProjectData.get_select_layer_ids():
 		var texture = get_image_layer(layer_id).get_image_texture()
 		layer_id_to_textures[layer_id] = texture.duplicate()
 	return layer_id_to_textures
 
+
 var _layer_id_to_before_colors : Dictionary = {}
 var _layer_id_to_before_texture : Dictionary = {}
 
-func _ready_draw() -> void:
-	grab_focus()
-	
-	# 绘制前的数据
-	_layer_id_to_before_colors = _get_draw_colors_data()
-	_layer_id_to_before_texture = _get_layer_id_to_textures()
-
-
-func _draw_finished() -> void:
-	var layer_id_to_textures = _get_layer_id_to_textures()
-	var current_colors_data = _get_draw_colors_data()
+func draw_colors_data(colors_data: Dictionary, execute: bool = false):
+	var layer_id_to_textures = _get_current_layer_textures()
 	var current_frame_id = ProjectData.get_current_frame_id()
 	var select_layer_ids = ProjectData.get_select_layer_ids()
 	ProjectData.add_undo_redo(
 		"绘制",
-		__menu_draw_data.bind(current_colors_data, layer_id_to_textures, current_frame_id, select_layer_ids),
-		__menu_draw_data.bind(_layer_id_to_before_colors.duplicate(), _layer_id_to_before_texture.duplicate(), current_frame_id, select_layer_ids),
-		false
+		__draw_colors.bind(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids),
+		__draw_colors.bind(_layer_id_to_before_colors.duplicate(), _layer_id_to_before_texture.duplicate(), current_frame_id, select_layer_ids),
+		execute
 	)
 
-
-func __menu_draw_data(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids):
+func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids):
 	var colors : Dictionary
 	for layer_id in colors_data:
 		var frame_data : Dictionary = colors_data[layer_id]
+		draw_by_data(colors_data[layer_id][current_frame_id])
 		for frame_id in frame_data:
 			colors = frame_data[frame_id]
 			ProjectData.update_image_colors(layer_id, frame_id, colors)
-	
 	for layer_id in select_layer_ids:
 		ProjectData.update_texture( layer_id, current_frame_id, layer_id_to_textures[layer_id])
-	
 		var image_layer : ImageLayer = get_image_layer(layer_id)
 		image_layer.load_data(layer_id, current_frame_id)
-	
 
+
+func _ready_draw() -> void:
+	grab_focus()
+	# 绘制前的数据
+	_layer_id_to_before_colors = _get_draw_colors_data()
+	_layer_id_to_before_texture = _get_current_layer_textures()
+
+
+func _draw_finished() -> void:
+	draw_colors_data( _get_draw_colors_data())
+
+
+func _on_line_released(colors) -> void:
+	var data = {}
+	var frame_id = ProjectData.get_current_frame_id()
+	for layer_id in ProjectData.get_select_layer_ids():
+		data[layer_id] = {
+			frame_id: colors
+		}
+	draw_colors_data(data, true)

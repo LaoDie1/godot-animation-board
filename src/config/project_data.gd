@@ -163,12 +163,22 @@ func menu_add_layer():
 
 func menu_add_frame():
 	var frame_id = get_new_frame_id()
+	var last_frame_id = get_current_frame_id()
 	add_undo_redo(
 		"添加帧",
 		new_frame.bind(frame_id),
-		remove_frame.bind(frame_id),
+		remove_frame.bind(frame_id, last_frame_id),
 		true
 	)
+
+func __menu_add_frame_do(frame_id):
+	new_frame(frame_id)
+	update_current_frame(frame_id)
+
+func __menu_add_frame_undo(frame_id, last_frame_id):
+	remove_frame(frame_id)
+	update_current_frame(last_frame_id)
+
 
 func menu_insert_frame():
 	var frame_id = get_current_frame_id()
@@ -182,7 +192,7 @@ func menu_insert_frame():
 
 func __menu_add_frame_to_front_do(frame_id, new_frame_id):
 	new_frame(new_frame_id, frame_id)
-	update_current_frame(frame_id)
+	update_current_frame(new_frame_id)
 
 func __menu_add_frame_to_front_undo(frame_id, new_frame_id):
 	remove_frame(new_frame_id)
