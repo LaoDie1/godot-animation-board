@@ -16,10 +16,17 @@ class KEY:
 	static var COLORS
 
 
+class TOOL:
+	static var CURRENT # 当前工具
+
 # 钢笔工具
 class PEN:
 	static var COLOR
 	static var LINE_WIDTH
+
+# 橡皮擦
+class ERASER:
+	static var SIZE
 
 # 图片
 class IMAGE:

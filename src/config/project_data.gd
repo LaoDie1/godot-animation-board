@@ -32,12 +32,15 @@ signal config_changed(property:String, last_value, value)
 
 
 var _config_data: Dictionary = {} # 配置数据
-
+var _listen_property_callback: Dictionary = {} # 监听属性改变
 
 func set_config(property: String, value):
 	var last_value = _config_data.get(property)
 	if typeof(last_value) != typeof(value) or last_value != value:
 		_config_data[property] = value
+		if _listen_property_callback.has(property):
+			for method:Callable in _listen_property_callback[property]:
+				method.call(last_value, value)
 		config_changed.emit(property, last_value, value)
 
 func get_config(property, default = null):
@@ -46,6 +49,12 @@ func get_config(property, default = null):
 	else:
 		_config_data[property] = default
 		return default
+
+## 监听这个属性的改变。监听的方法需要有两个参数，一个接收修改前的值，一个为当前的值
+func listen_property(property: String, method: Callable):
+	if not _listen_property_callback.has(property):
+		_listen_property_callback[property] = []
+	_listen_property_callback[property].append(method)
 
 
 ## 更新 PropertyName 子类的静态变量的值为自身的名称
@@ -86,6 +95,21 @@ static func init_property_name():
 		for property:String in property_list:
 			object[property] = StringName("/" + c_name.to_lower() + "/" + property.to_lower())
 
+var _size_to_stroke_points : Dictionary = {}
+
+## 获取笔触点
+func get_stroke_points(size: int) -> Array:
+	if not _size_to_stroke_points.has(size):
+		var points : Array = []
+		var point : Vector2i = Vector2i()
+		for x in range(-size, size+1):
+			point.x = x
+			for y in range(-size, size+1):
+				point.y = y
+				if point.length() < size:
+					points.append(point)
+		_size_to_stroke_points[size] = points
+	return _size_to_stroke_points[size]
 
 
 #============================================================

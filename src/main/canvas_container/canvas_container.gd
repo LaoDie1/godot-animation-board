@@ -25,28 +25,9 @@ var _current_tool : ToolBase # 当前使用的工具
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.newly_layer.connect(create_layer)
-	ProjectData.config_changed.connect(_config_changed)
-
-
-func _ready() -> void:
-	# 图像大小
-	var image_size : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
-	_config_changed(PropertyName.IMAGE.RECT, image_size, image_size )
-	
-	# 图层
-	move_image_ref.visible = false
-	
-	# 工具
-	tools.set_input_board(input_board)
-	tools.active_tool("pen")
-
-
-#============================================================
-#  自定义
-#============================================================
-func _config_changed(property, last_rect, image_rect):
-	if property == PropertyName.IMAGE.RECT:
+	ProjectData.listen_property(PropertyName.IMAGE.RECT, func(last_rect, image_rect):
+		if typeof(last_rect) == TYPE_NIL:
+			last_rect = Rect2i()
 		var last_image_size : Vector2i = last_rect.size
 		var image_size : Vector2i = image_rect.size
 		var max_size : Vector2i 
@@ -65,7 +46,24 @@ func _config_changed(property, last_rect, image_rect):
 		# 更新节点
 		for tool:ToolBase in tools.get_children():
 			tool.image_rect = _image_rect
+	)
+	ProjectData.listen_property(PropertyName.TOOL.CURRENT, func(last, current):
+		active_tool(current)
+	)
+	ProjectData.newly_layer.connect(create_layer)
 
+
+func _ready() -> void:
+	# 图层
+	move_image_ref.visible = false
+	# 工具
+	tools.set_input_board(input_board)
+	tools.active_tool("pen")
+
+
+#============================================================
+#  自定义
+#============================================================
 func active_tool(tool_name: String):
 	tools.active_tool(tool_name)
 
@@ -143,13 +141,12 @@ func _on_move_move_finished() -> void:
 		for layer_id in ProjectData.get_select_layer_ids():
 			get_image_layer(layer_id).set_offset_colors(offset)
 
+func _ready_draw() -> void:
+	grab_focus()
 
-func _on_pen_draw_finished() -> void:
+func _draw_finished() -> void:
 	var frame_id = ProjectData.get_current_frame_id()
 	for layer_id in ProjectData.get_select_layer_ids():
 		var texture = get_image_layer(layer_id).get_image_texture()
 		ProjectData.update_texture( layer_id, frame_id, texture )
 
-
-func _on_pen_ready_draw() -> void:
-	grab_focus()

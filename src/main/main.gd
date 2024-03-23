@@ -23,7 +23,6 @@ var _undo_redo : UndoRedo = UndoRedo.new()
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.set_config(PropertyName.IMAGE.RECT, Rect2i(0, 0, 500, 500))
 	# 切换帧
 	ProjectData.frame_changed.connect(
 		func(last_frame_id, frame_id):
@@ -45,6 +44,8 @@ func _init() -> void:
 func _ready() -> void:
 	_init_menu()
 	
+	ProjectData.set_config(PropertyName.IMAGE.RECT, Rect2i(0, 0, 500, 500))
+	
 	# 工具栏
 	var tool_button_group : ButtonGroup = ButtonGroup.new()
 	for tool_button:BaseButton in tool_button_container.get_children():
@@ -52,7 +53,7 @@ func _ready() -> void:
 	tool_button_group.pressed.connect(
 		func(tool_button: BaseButton):
 			var tool_name = tool_button.name
-			canvas_container.active_tool(tool_name)
+			ProjectData.set_config(PropertyName.TOOL.CURRENT, tool_name)
 	)
 	tool_button_container.get_child(0).button_pressed = true
 	
