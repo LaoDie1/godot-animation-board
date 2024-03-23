@@ -10,4 +10,111 @@ class_name ImageLayerTimeline
 extends Control
 
 
+## 当前的层级发生改变
+signal layer_frame_changed(last_layer_id: int, last_frame_id: int, press_layer_id: int, press_frame_id: int)
+
+
+## 偏移显示的帧
+@export var offset_frame: int :
+	set(v):
+		offset_frame = v
+		if not is_inside_tree():
+			await ready
+		# 帧偏移
+		var frame_track:FrameTrack
+		for layer_id in _id_to_frame_track:
+			frame_track = get_frame_track(layer_id)
+			frame_track.offset_frame = offset_frame
+
+
+@onready var frame_item_template: HBoxContainer = %FrameItemTemplate
+@onready var frames_container: VBoxContainer = %frames_container
+
+
+var _last_layer_id : int = ProjectData.DEFAULT_LAYER
+var _last_frame_id : int = ProjectData.DEFAULT_FRAME
+var _coords_to_images : Dictionary = {}
+var _id_to_frame_track : Dictionary = {}
+
+
+#============================================================
+#  内置
+#============================================================
+func _init() -> void:
+	ProjectData.newly_layer.connect(create_layer)
+	ProjectData.newly_frame.connect(create_frame)
+
+
+#============================================================
+#  自定义
+#============================================================
+func _clicked_frame(frame_id: int, layer_id: int):
+	# 超出范围
+	if frame_id > ProjectData.get_max_frame_id():
+		return
+	# 切换帧
+	layer_frame_changed.emit(_last_layer_id, _last_frame_id, layer_id, frame_id)
+	_last_layer_id = layer_id
+	_last_frame_id = frame_id
+	var frame_track:FrameTrack
+	for id in _id_to_frame_track:
+		frame_track = get_frame_track(id)
+		frame_track.select_frame = frame_id
+
+func get_last_frame_id() -> int:
+	return _last_frame_id
+
+func get_last_layer_id() -> int:
+	return _last_layer_id
+
+
+func get_frame_track(layer_id: int) -> FrameTrack:
+	var frame_item : Node = _id_to_frame_track[layer_id]
+	var frame_track : FrameTrack = frame_item.get_node("FrameTrack")
+	return frame_track
+
+## 创建层级
+func create_layer(layer_id: int):
+	# 帧轨道
+	var item = frame_item_template.duplicate()
+	frames_container.add_child(item)
+	frames_container.move_child(item, 0)
+	_id_to_frame_track[layer_id] = item
+	# 层级名称
+	var label = item.get_node("Label")
+	label.text = "Layer %d" % layer_id
+	# 点击轨道帧
+	var frame_track : FrameTrack = get_frame_track(layer_id)
+	frame_track.layer_id = layer_id
+	frame_track.clicked_frame.connect(_clicked_frame.bind(layer_id))
+	# 帧轨道的图片
+	var texture : ImageTexture
+	for frame_id in ProjectData.get_frame_ids():
+		texture = ProjectData.get_image_texture(layer_id, frame_id)
+		frame_track.add_frame(frame_id, texture)
+
+
+## 创建帧
+func create_frame(frame_id: int):
+	for layer_id in ProjectData.get_layer_ids():
+		var frame_track : FrameTrack = get_frame_track(layer_id)
+		var texture = ProjectData.get_image_texture(layer_id, frame_id)
+		frame_track.add_frame(frame_id, texture)
+
+
+#============================================================
+#  连接信号
+#============================================================
+func _on_new_layer_pressed() -> void:
+	ProjectData.new_layer()
+
+func _on_new_frame_pressed() -> void:
+	ProjectData.new_frame()
+
+func _on_play_pressed() -> void:
+	pass # Replace with function body.
+
+func _on_stop_pressed() -> void:
+	pass # Replace with function body.
+
 

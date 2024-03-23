@@ -11,6 +11,7 @@ extends VBoxContainer
 
 signal selected_layers()
 
+
 const META_KEY_ID = "_id"
 
 var _id_to_layer_data : Dictionary = {}
@@ -33,6 +34,7 @@ func _init() -> void:
 			_selected_layer_ids = [id]
 			self.selected_layers.emit()
 	)
+	ProjectData.newly_layer.connect(create_layer)
 
 
 #============================================================

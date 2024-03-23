@@ -45,7 +45,6 @@ func _gui_input(event: InputEvent) -> void:
 			else:
 				_release_point = Vector2i(get_local_mouse_position())
 				release.emit()
-			
 
 
 #============================================================

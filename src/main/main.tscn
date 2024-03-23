@@ -1,11 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://c2ch44wucrt8m"]
+[gd_scene load_steps=12 format=3 uid="uid://c2ch44wucrt8m"]
 
 [ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
 [ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
 [ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/draw_container/draw_container.tscn" id="3_3liki"]
-[ext_resource type="Script" path="res://src/config/project_config.gd" id="5_iwf0a"]
+[ext_resource type="Script" path="res://src/config/project_data.gd" id="5_iwf0a"]
 [ext_resource type="Script" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
 [ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/pen_setting.tscn" id="6_ge575"]
+[ext_resource type="PackedScene" uid="uid://ccvi3ga25277e" path="res://src/main/image_layer_timeline/image_layer_timeline.tscn" id="7_i4wsq"]
 
 [sub_resource type="InputEventKey" id="InputEventKey_s26vr"]
 device = -1
@@ -61,28 +62,33 @@ script = ExtResource("1_3rbfd")
 [node name="top_toolbar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="EditContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = -200
+
+[node name="EditContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VSplitContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/EditContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="drawing_toolbar" type="PanelContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer"]
+[node name="drawing_toolbar" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/drawing_toolbar"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar"]
 layout_mode = 2
 
-[node name="tool_button_container" type="BoxContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer"]
+[node name="tool_button_container" type="BoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="pen" type="Button" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
+[node name="pen" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -90,7 +96,7 @@ toggle_mode = true
 shortcut = SubResource("Shortcut_o7n6u")
 text = "pen"
 
-[node name="move" type="Button" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
+[node name="move" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -98,30 +104,46 @@ toggle_mode = true
 shortcut = SubResource("Shortcut_3im42")
 text = "move"
 
-[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
 layout_mode = 2
 split_offset = -300
 
-[node name="DrawContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer" instance=ExtResource("3_3liki")]
+[node name="ScrollContainer" type="Control" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DrawContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/ScrollContainer" instance=ExtResource("3_3liki")]
 unique_name_in_owner = true
 layout_mode = 2
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 750.0
+offset_bottom = 420.0
 focus_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
 layout_mode = 2
 
-[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer"]
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer"]
 layout_mode = 2
 tab_focus_mode = 0
 
-[node name="LayerButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer"]
+[node name="LayerButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_lepq6")
 
-[node name="PenSetting" parent="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer" instance=ExtResource("6_ge575")]
+[node name="PenSetting" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer" instance=ExtResource("6_ge575")]
 visible = false
 layout_mode = 2
 
+[node name="ImageLayerTimeline" parent="MarginContainer/VBoxContainer/VSplitContainer" instance=ExtResource("7_i4wsq")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
 [connection signal="menu_pressed" from="MarginContainer/VBoxContainer/SimpleMenu" to="." method="_on_simple_menu_menu_pressed"]
-[connection signal="selected_layers" from="MarginContainer/VBoxContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer/LayerButtons" to="." method="_on_layer_buttons_selected_layers"]
+[connection signal="selected_layers" from="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer/LayerButtons" to="." method="_on_layer_buttons_selected_layers"]
+[connection signal="layer_frame_changed" from="MarginContainer/VBoxContainer/VSplitContainer/ImageLayerTimeline" to="." method="_on_image_layer_timeline_layer_frame_changed"]

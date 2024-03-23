@@ -28,16 +28,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Node" type="Node" parent="ScrollContainer"]
-
-[node name="move_image_ref" type="ReferenceRect" parent="ScrollContainer/Node"]
-unique_name_in_owner = true
-offset_right = 100.0
-offset_bottom = 100.0
-mouse_filter = 2
-border_color = Color(0.309804, 0.309804, 0.309804, 0.717647)
-editor_only = false
-
 [node name="MarginContainer" type="MarginContainer" parent="ScrollContainer"]
 clip_contents = true
 layout_mode = 2
@@ -53,6 +43,15 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_wuo3d")
+
+[node name="move_image_ref" type="ReferenceRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 100.0
+offset_bottom = 100.0
+mouse_filter = 2
+border_color = Color(0.309804, 0.309804, 0.309804, 0.717647)
+editor_only = false
 
 [node name="tools" type="Node" parent="."]
 unique_name_in_owner = true

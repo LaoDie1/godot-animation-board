@@ -10,6 +10,9 @@ class_name ImageLayer
 extends Control
 
 
+signal image_changed()
+
+
 var _draw_colors : Dictionary = {}
 var _rect : Rect2i = Rect2i()
 var _image : Image
@@ -19,41 +22,37 @@ var _image_texture : ImageTexture
 #============================================================
 #  内置
 #============================================================
-func _ready() -> void:
-	var image_size : Vector2i = ProjectConfig.get_config(PropertyName.IMAGE.SIZE)
-	_rect.size = image_size
-	ProjectConfig.config_changed.connect(
+func _init() -> void:
+	ProjectData.config_changed.connect(
 		func(property, last_value, value):
 			if property == PropertyName.IMAGE.SIZE:
 				self._rect.size = value
+				self.size = value
 	)
+
+func _ready() -> void:
+	var image_size : Vector2i = ProjectData.get_config(PropertyName.IMAGE.SIZE)
+	_rect.size = image_size
 	custom_minimum_size = image_size
-	new_data()
-	queue_redraw()
 
 
 func _draw() -> void:
 	draw_texture(_image_texture, Vector2(0,0))
 	if self.size != Vector2(_rect.size):
 		self.size = Vector2(_rect.size)
+	image_changed.emit()
 
 
 #============================================================
 #  自定义
 #============================================================
-## 新的数据
-func new_data():
-	_draw_colors = {}
-	var image_size : Vector2i = ProjectConfig.get_config(PropertyName.IMAGE.SIZE)
-	_image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
-	_image_texture = ImageTexture.create_from_image(_image)
-	queue_redraw()
-
 ## 加载数据
 func load_data(data: Dictionary):
-	for p in data:
-		set(p, data[p])
+	var texture = data[PropertyName.KEY.TEXTURE]
+	_image_texture = texture
+	_image = _image_texture.get_image()
 	queue_redraw()
+
 
 ## 获取数据
 func get_data():
@@ -63,9 +62,15 @@ func get_data():
 		"_draw_colors": _draw_colors,
 	}
 
+## 获取图像数据
+func get_image_texture() -> ImageTexture:
+	return _image_texture
 
 ## 设置颜色偏移
 func set_offset_colors(offset: Vector2i):
+	if offset == Vector2i.ZERO:
+		return
+	
 	# 原始数据偏移
 	var data = {}
 	for p in _draw_colors:

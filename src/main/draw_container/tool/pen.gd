@@ -22,11 +22,11 @@ var _drawn_points_color : Dictionary = {} # 已绘制到的点位颜色
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectConfig.config_changed.connect(config_changed)
+	ProjectData.config_changed.connect(config_changed)
 
 
 func _ready() -> void:
-	ProjectConfig.set_config(PropertyName.PEN.LINE_WIDTH, 1)
+	ProjectData.set_config(PropertyName.PEN.LINE_WIDTH, 1)
 
 
 #============================================================
@@ -54,7 +54,7 @@ func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
 	var points = DrawDataUtil.get_line_points(last_point, current_point)
 	var draw_data : Dictionary = {}
 	var tmp_p : Vector2i
-	var pen_color = ProjectConfig.get_config(PropertyName.PEN.COLOR)
+	var pen_color = ProjectData.get_config(PropertyName.PEN.COLOR)
 	for point in points:
 		# 笔触
 		for offset_p in _stroke_points:

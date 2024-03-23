@@ -13,16 +13,33 @@ extends Control
 @onready var draw_container: DrawContainer = %DrawContainer
 @onready var layer_buttons: LayerButtons = %LayerButtons
 @onready var tool_button_container: BoxContainer = %tool_button_container
+@onready var image_layer_timeline: ImageLayerTimeline = %ImageLayerTimeline
 
-var _layer_id : int = 0
+
 var _undo_redo : UndoRedo = UndoRedo.new()
 
 
 #============================================================
 #  内置
 #============================================================
-func _enter_tree() -> void:
-	ProjectConfig.set_config(PropertyName.IMAGE.SIZE, Vector2i(500, 500))
+func _init() -> void:
+	ProjectData.set_config(PropertyName.IMAGE.SIZE, Vector2i(500, 500))
+	# 切换帧
+	ProjectData.frame_changed.connect(
+		func(last_frame_id, frame_id):
+			# 更新上一次的帧和层数据
+			for layer_id in ProjectData.get_layer_ids():
+				var image_layer : ImageLayer = draw_container.get_image_layer(layer_id)
+				var texture = image_layer.get_image_texture()
+				ProjectData.update_texture(layer_id, last_frame_id, texture)
+			
+			# 加载当前帧和层的数据
+			for layer_id in ProjectData.get_layer_ids():
+				var data : Dictionary = ProjectData.get_image_data(layer_id, frame_id)
+				var image_layer : ImageLayer = draw_container.get_image_layer(layer_id)
+				image_layer.load_data(data)
+	)
+	
 
 
 func _ready() -> void:
@@ -40,10 +57,10 @@ func _ready() -> void:
 	tool_button_container.get_child(0).button_pressed = true
 	
 	# 创建图层
-	create_layer()
-	create_layer()
-	create_layer()
-	
+	ProjectData.new_frame()
+	ProjectData.new_layer()
+	ProjectData.new_layer()
+	# 选中图层1
 	layer_buttons.select_layer(1)
 
 
@@ -51,10 +68,6 @@ func _ready() -> void:
 #============================================================
 #  自定义
 #============================================================
-func _get_new_id() -> int:
-	_layer_id += 1
-	return _layer_id
-
 func _init_menu():
 	menu.init_menu({
 		"File": [
@@ -83,14 +96,6 @@ func _add_undo_redo(action_name: String, do_method: Callable, undo_method: Calla
 	menu.set_menu_disabled_by_path("/Edit/Undo", false)
 
 
-func create_layer() -> int:
-	var layer_id : int = _get_new_id()
-	draw_container.create_layer(layer_id)
-	layer_buttons.create_layer(layer_id)
-	return layer_id
-
-
-
 #============================================================
 #  连接信号
 #============================================================
@@ -114,5 +119,9 @@ func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 
 
 func _on_layer_buttons_selected_layers() -> void:
-	draw_container.clear_select_layer()
-	draw_container.add_select_layers(layer_buttons.get_selected_layer_ids())
+	ProjectData.clear_select_layer()
+	ProjectData.add_select_layers(layer_buttons.get_selected_layer_ids())
+
+
+func _on_image_layer_timeline_layer_frame_changed(last_layer_id: int, last_frame_id: int, layer_id: int, frame_id: int) -> void:
+	ProjectData.update_current_frame(frame_id)

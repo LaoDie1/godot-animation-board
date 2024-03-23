@@ -15,8 +15,8 @@ extends ScrollContainer
 #  内置
 #============================================================
 func _ready() -> void:
-	ProjectConfig.set_config(PropertyName.PEN.COLOR, pen_color.color)
-	ProjectConfig.set_config(PropertyName.PEN.LINE_WIDTH, pen_line_width.value)
+	ProjectData.set_config(PropertyName.PEN.COLOR, pen_color.color)
+	ProjectData.set_config(PropertyName.PEN.LINE_WIDTH, pen_line_width.value)
 
 
 
@@ -24,7 +24,7 @@ func _ready() -> void:
 #  连接信号
 #============================================================
 func _on_pen_color_color_changed(color: Color) -> void:
-	ProjectConfig.set_config(PropertyName.PEN.COLOR, color)
+	ProjectData.set_config(PropertyName.PEN.COLOR, color)
 
 func _on_pen_line_width_value_changed(value: float) -> void:
-	ProjectConfig.set_config(PropertyName.PEN.LINE_WIDTH, value)
+	ProjectData.set_config(PropertyName.PEN.LINE_WIDTH, value)
