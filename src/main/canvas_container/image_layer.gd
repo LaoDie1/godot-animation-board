@@ -85,62 +85,19 @@ func set_offset_colors(offset: Vector2i):
 	queue_redraw()
 
 
-func update_image():
-	_image_texture.update(_image)
-	ProjectData.update_texture( _last_layer_id, _last_frame_id, _image_texture)
-	queue_redraw()
-
-
 ## 根据数据绘制颜色。数据格式为: data[Vector2i()] = Color()
 func draw_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 	if data.is_empty():
 		return
 	
 	# 更新图像数据
-	var image_colors : Dictionary = ProjectData.get_image_colors(_last_layer_id, _last_frame_id)
-	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
-	if offset == Vector2i.ZERO:
-		image_colors.merge(data, true)
-		for point in data:
-			if image_rect.has_point(point):
-				_image.set_pixelv(point, data[point])
-	else:
-		var tmp_point : Vector2i
-		for point in data:
-			tmp_point = point + offset
-			if image_rect.has_point(tmp_point):
-				_image.set_pixelv(tmp_point, data[point])
-				image_colors[tmp_point] = data[point]
-	
-	update_image()
+	ProjectData.add_image_colors(_last_layer_id, _last_frame_id, data, offset)
+	queue_redraw()
 
 
 ## 根据 Texture2D 绘制颜色
 func draw_color_by_texture(texture: Texture2D, offset: Vector2i = Vector2i.ZERO):
-	var image = texture.get_image()
-	var image_colors : Dictionary = ProjectData.get_image_colors(_last_layer_id, _last_frame_id)
-	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
-	
-	var curr_image_size = image.get_size()
-	var color : Color
-	if offset == Vector2i.ZERO:
-		for x in curr_image_size.x:
-			for y in curr_image_size.y:
-				color = image.get_pixel(x, y)
-				_image.set_pixel(x, y, color)
-				image_colors[Vector2i(x, y)] = color
-	else:
-		var point : Vector2i
-		var tmp_point : Vector2i
-		for x in curr_image_size.x:
-			for y in curr_image_size.y:
-				point = Vector2i(x, y)
-				tmp_point = point + offset
-				if image_rect.has_point(tmp_point):
-					color = image.get_pixel(x, y)
-					_image.set_pixelv(tmp_point, color)
-					image_colors[tmp_point] = color
-	
-	update_image()
+	ProjectData.add_image_texture(_last_layer_id, _last_frame_id, texture, offset)
+	queue_redraw()
 
 

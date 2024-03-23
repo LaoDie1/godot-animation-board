@@ -98,15 +98,16 @@ static func init_property_name():
 var _size_to_stroke_points : Dictionary = {}
 
 ## 获取笔触点
-func get_stroke_points(size: int) -> Array:
+func get_stroke_points(size) -> Array:
 	if not _size_to_stroke_points.has(size):
 		var points : Array = []
 		var point : Vector2i = Vector2i()
-		for x in range(-size, size+1):
+		var width = size / 2.0
+		for x in range(-size, size):
 			point.x = x
-			for y in range(-size, size+1):
+			for y in range(-size, size):
 				point.y = y
-				if point.length() < size:
+				if point.length() <= width:
 					points.append(point)
 		_size_to_stroke_points[size] = points
 	return _size_to_stroke_points[size]
@@ -234,6 +235,58 @@ func get_image_texture(layer_id: float, frame_id: float) -> ImageTexture:
 func get_image_colors(layer_id: float, frame_id: float) -> Dictionary:
 	var data : Dictionary = get_image_data(layer_id, frame_id)
 	return data[PropertyName.KEY.COLORS]
+
+func add_image_colors(layer_id, frame_id, data: Dictionary, offset: Vector2i = Vector2i.ZERO):
+	# 合并
+	var texture = get_image_texture(layer_id, frame_id)
+	var image = texture.get_image()
+	var image_colors : Dictionary = get_image_colors(layer_id, frame_id)
+	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	if offset == Vector2i.ZERO:
+		image_colors.merge(data, true)
+		for point in data:
+			if image_rect.has_point(point):
+				image.set_pixelv(point, data[point])
+	else:
+		var tmp_point : Vector2i
+		for point in data:
+			tmp_point = point + offset
+			if image_rect.has_point(tmp_point):
+				image.set_pixelv(tmp_point, data[point])
+				image_colors[tmp_point] = data[point]
+	# 更新图像数据
+	texture.update(image)
+	update_texture( layer_id, frame_id, texture)
+
+func add_image_texture(layer_id, frame_id, texture: Texture2D, offset: Vector2i = Vector2i.ZERO):
+	var image = texture.get_image()
+	var image_colors : Dictionary = get_image_colors(layer_id, frame_id)
+	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	# 合并
+	var frame_texture = get_image_texture(layer_id, frame_id)
+	var frame_image = frame_texture.get_image()
+	var curr_image_size = image.get_size()
+	var color : Color
+	if offset == Vector2i.ZERO:
+		for x in curr_image_size.x:
+			for y in curr_image_size.y:
+				color = image.get_pixel(x, y)
+				frame_image.set_pixel(x, y, color)
+				image_colors[Vector2i(x, y)] = color
+	else:
+		var point : Vector2i
+		var tmp_point : Vector2i
+		for x in curr_image_size.x:
+			for y in curr_image_size.y:
+				point = Vector2i(x, y)
+				tmp_point = point + offset
+				if image_rect.has_point(tmp_point):
+					color = image.get_pixel(x, y)
+					frame_image.set_pixelv(tmp_point, color)
+					image_colors[tmp_point] = color
+	# 更新数据
+	frame_texture.update(frame_image)
+	update_texture( layer_id, frame_id, frame_texture)
 
 func update_image_colors(layer_id: float, frame_id: float, colors: Dictionary):
 	var data : Dictionary = get_image_data(layer_id, frame_id)

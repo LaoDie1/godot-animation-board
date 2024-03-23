@@ -15,6 +15,7 @@ extends Control
 @onready var tools: Tools = %tools
 @onready var move_image_ref: ReferenceRect = %MoveImageRef
 @onready var onionskin: Control = %Onionskin # 洋葱皮节点
+@onready var line: Line2D = %Line
 
 
 var _image_rect : Rect2i = Rect2i()
@@ -175,7 +176,9 @@ func _get_current_layer_textures() -> Dictionary:
 var _layer_id_to_before_colors : Dictionary = {}
 var _layer_id_to_before_texture : Dictionary = {}
 
-func draw_colors_data(colors_data: Dictionary, execute: bool = false):
+
+# 绘制颜色数据。这个会记录修改后的数据，所以调用前先修改好数据在调用这个方法
+func draw_colors_data(colors_data: Dictionary):
 	var layer_id_to_textures = _get_current_layer_textures()
 	var current_frame_id = ProjectData.get_current_frame_id()
 	var select_layer_ids = ProjectData.get_select_layer_ids()
@@ -183,14 +186,14 @@ func draw_colors_data(colors_data: Dictionary, execute: bool = false):
 		"绘制",
 		__draw_colors.bind(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids),
 		__draw_colors.bind(_layer_id_to_before_colors.duplicate(), _layer_id_to_before_texture.duplicate(), current_frame_id, select_layer_ids),
-		execute
+		false
 	)
 
 func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids):
 	var colors : Dictionary
 	for layer_id in colors_data:
 		var frame_data : Dictionary = colors_data[layer_id]
-		draw_by_data(colors_data[layer_id][current_frame_id])
+		draw_by_data(frame_data[current_frame_id])
 		for frame_id in frame_data:
 			colors = frame_data[frame_id]
 			ProjectData.update_image_colors(layer_id, frame_id, colors)
@@ -202,7 +205,11 @@ func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_l
 
 func _ready_draw() -> void:
 	grab_focus()
-	# 绘制前的数据
+	
+	line.points = [get_local_mouse_position()]
+	line.width = ProjectData.get_config(PropertyName.LINE.WIDTH, 1)
+	
+	# 绘制前的数据（这之后，可以随意图像操作的数据，撤销后即会还原为绘制前的数据）
 	_layer_id_to_before_colors = _get_draw_colors_data()
 	_layer_id_to_before_texture = _get_current_layer_textures()
 
@@ -211,11 +218,20 @@ func _draw_finished() -> void:
 	draw_colors_data( _get_draw_colors_data())
 
 
-func _on_line_released(colors) -> void:
+func _on_line_moved(last_point: Vector2i, current_point: Vector2i) -> void:
+	line.visible = true
+	line.points = [
+		input_board.get_last_pressed_point(), current_point
+	]
+
+
+func _on_line_released(colors: Dictionary) -> void:
 	var data = {}
 	var frame_id = ProjectData.get_current_frame_id()
 	for layer_id in ProjectData.get_select_layer_ids():
+		ProjectData.add_image_colors(layer_id, frame_id, colors)
 		data[layer_id] = {
 			frame_id: colors
 		}
-	draw_colors_data(data, true)
+	draw_colors_data(data)
+	line.visible = false

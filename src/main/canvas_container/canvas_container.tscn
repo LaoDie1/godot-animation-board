@@ -38,15 +38,15 @@ layout_mode = 2
 [node name="BackgroundPanel" type="Panel" parent="ScrollContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="ImageLayers" type="Control" parent="ScrollContainer/MarginContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-
 [node name="Onionskin" type="Control" parent="ScrollContainer/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_yoelk")
 frame_range = 3
+
+[node name="ImageLayers" type="Control" parent="ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="InputBoard" type="Control" parent="ScrollContainer/MarginContainer"]
 unique_name_in_owner = true
@@ -61,6 +61,11 @@ offset_bottom = 100.0
 mouse_filter = 2
 border_color = Color(0.309804, 0.309804, 0.309804, 0.717647)
 editor_only = false
+
+[node name="Line" type="Line2D" parent="."]
+unique_name_in_owner = true
+begin_cap_mode = 2
+end_cap_mode = 2
 
 [node name="tools" type="Node" parent="."]
 unique_name_in_owner = true
@@ -87,5 +92,6 @@ script = ExtResource("8_vcteg")
 [connection signal="move_finished" from="tools/move" to="." method="_on_move_move_finished"]
 [connection signal="move_position" from="tools/move" to="." method="_on_move_move_position"]
 [connection signal="ready_move" from="tools/move" to="." method="_on_move_ready_move"]
+[connection signal="moved" from="tools/line" to="." method="_on_line_moved"]
 [connection signal="pressed" from="tools/line" to="." method="_ready_draw"]
 [connection signal="released" from="tools/line" to="." method="_on_line_released"]

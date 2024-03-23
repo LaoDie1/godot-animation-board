@@ -34,20 +34,13 @@ func _pressed():
 
 
 func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
-	var erase_size = ProjectData.get_config(PropertyName.PEN.LINE_WIDTH)
-	var stroke_points = ProjectData.get_stroke_points(erase_size)
-	
-	var points = DrawDataUtil.get_line_points(last_point, current_point)
-	var draw_data : Dictionary = {}
-	var tmp_p : Vector2i
+	var pen_line_width = ProjectData.get_config(PropertyName.PEN.LINE_WIDTH)
 	var pen_color = ProjectData.get_config(PropertyName.PEN.COLOR)
-	for point in points:
-		# 笔触
-		for offset_p in stroke_points:
-			tmp_p = point + offset_p
-			if not _drawn_points_color.has(tmp_p) and image_rect.has_point(tmp_p):
-				_drawn_points_color[tmp_p] = pen_color
-				draw_data[tmp_p] = pen_color
+	var points = DrawDataUtil.get_line_points(last_point, current_point)
+	var draw_data = DrawDataUtil.create_stroke_points(0, pen_line_width, image_rect, points, _drawn_points_color)
+	for point in draw_data:
+		draw_data[point] = pen_color
+		_drawn_points_color[point] = null
 	if not draw_data.is_empty():
 		drawn.emit(draw_data)
 

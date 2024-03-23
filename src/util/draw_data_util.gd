@@ -25,3 +25,14 @@ static func get_line_points(begin: Vector2i, end: Vector2i) -> Array[Vector2i]:
 		points.push_back(Vector2i(point))
 	return points
 
+static func create_stroke_points(type, width: int, image_rect: Rect2i, points: Array, exclude : Dictionary = {}) -> Dictionary:
+	var stroke_points = ProjectData.get_stroke_points(width)
+	var draw_data : Dictionary = {}
+	var tmp_p : Vector2i
+	for point in points:
+		# 笔触
+		for offset_p in stroke_points:
+			tmp_p = point + offset_p
+			if not exclude.has(tmp_p) and image_rect.has_point(tmp_p):
+				draw_data[tmp_p] = null
+	return draw_data

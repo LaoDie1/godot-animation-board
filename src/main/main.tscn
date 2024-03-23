@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c2ch44wucrt8m"]
+[gd_scene load_steps=13 format=3 uid="uid://c2ch44wucrt8m"]
 
 [ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
 [ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
@@ -14,6 +14,14 @@ unicode = 112
 
 [sub_resource type="Shortcut" id="Shortcut_o7n6u"]
 events = [SubResource("InputEventKey_s26vr")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_svnjd"]
+device = -1
+keycode = 69
+unicode = 101
+
+[sub_resource type="Shortcut" id="Shortcut_08v0l"]
+events = [SubResource("InputEventKey_svnjd")]
 
 [sub_resource type="InputEventKey" id="InputEventKey_0bfty"]
 device = -1
@@ -96,7 +104,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 toggle_mode = true
-shortcut = SubResource("Shortcut_o7n6u")
+shortcut = SubResource("Shortcut_08v0l")
 text = "Eraser"
 
 [node name="move" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
@@ -112,7 +120,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 toggle_mode = true
-shortcut = SubResource("Shortcut_3im42")
 text = "Line"
 
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
