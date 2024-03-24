@@ -144,26 +144,27 @@ grow_vertical = 2
 [node name="Pen" type="ScrollContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer"]
 layout_mode = 2
 
-[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen"]
+[node name="SettingTabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_focus_mode = 0
 
-[node name="ImageLayers" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer"]
+[node name="ImageLayers" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_lepq6")
 
-[node name="Pen" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("6_ge575")]
+[node name="Pen" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("6_ge575")]
 visible = false
 layout_mode = 2
 
-[node name="Eraser" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("7_7y26s")]
+[node name="Eraser" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("7_7y26s")]
 visible = false
 layout_mode = 2
 
-[node name="Canvas" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("8_2pss8")]
+[node name="Canvas" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("8_2pss8")]
 visible = false
 layout_mode = 2
 

@@ -29,6 +29,7 @@ func _init() -> void:
 	)
 	focus_mode = Control.FOCUS_CLICK
 
+
 func _ready() -> void:
 	self.size = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT).size
 

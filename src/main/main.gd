@@ -18,6 +18,7 @@ extends Control
 @onready var export_window: Window = %ExportWindow
 @onready var export_panel: ExportPanel = %ExportPanel
 @onready var new_project_window: Window = %NewProjectWindow
+@onready var setting_tab_container: TabContainer = %SettingTabContainer
 
 
 #============================================================
@@ -47,6 +48,12 @@ func _init() -> void:
 			layer_buttons.select_layer(1)
 			
 			current_frame_label.text = " Frame ID: %s" % str(ProjectData.get_current_frame_id())
+	)
+	
+	ProjectData.listen_config(PropertyName.KEY.CURRENT_TOOL, func(last, curr: String):
+		var node = setting_tab_container.get_node_or_null(curr.capitalize())
+		if node:
+			setting_tab_container.current_tab = node.get_index()
 	)
 
 
