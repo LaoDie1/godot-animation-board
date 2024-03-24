@@ -15,6 +15,14 @@ script = ExtResource("1_nw7q0")
 layout_mode = 2
 columns = 2
 
+[node name="Label2" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Shape:"
+
+[node name="EraserShape" type="OptionButton" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
 text = "Size:"
@@ -25,13 +33,5 @@ layout_mode = 2
 min_value = 1.0
 value = 2.0
 
-[node name="Label2" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "Shape:"
-
-[node name="EraserShape" type="OptionButton" parent="GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[connection signal="value_changed" from="GridContainer/EraserSize" to="." method="_on_eraser_size_value_changed"]
 [connection signal="item_selected" from="GridContainer/EraserShape" to="." method="_on_eraser_shape_item_selected"]
+[connection signal="value_changed" from="GridContainer/EraserSize" to="." method="_on_eraser_size_value_changed"]

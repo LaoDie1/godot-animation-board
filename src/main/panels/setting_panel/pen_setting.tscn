@@ -17,6 +17,14 @@ script = ExtResource("1_igheu")
 layout_mode = 2
 columns = 2
 
+[node name="Label3" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Shape"
+
+[node name="PenShape" type="OptionButton" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
 text = "Pen Color"
@@ -38,14 +46,6 @@ min_value = 1.0
 max_value = 500.0
 value = 2.0
 
-[node name="Label3" type="Label" parent="GridContainer"]
-layout_mode = 2
-text = "Shape"
-
-[node name="PenShape" type="OptionButton" parent="GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-
+[connection signal="item_selected" from="GridContainer/PenShape" to="." method="_on_pen_shape_item_selected"]
 [connection signal="color_changed" from="GridContainer/PenColor" to="." method="_on_pen_color_color_changed"]
 [connection signal="value_changed" from="GridContainer/PenLineWidth" to="." method="_on_pen_line_width_value_changed"]
-[connection signal="item_selected" from="GridContainer/PenShape" to="." method="_on_pen_shape_item_selected"]
