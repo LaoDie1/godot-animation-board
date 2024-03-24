@@ -31,9 +31,9 @@ const SPACE_WIDTH = 48
 var _frame_image_size : int = 40
 
 
-static var frame_board_color: Color = Color(1, 1, 1, 0.5)
+static var frame_board_color: Color = Color(1, 1, 1, 0.3)
 static var select_frame_color: Color = Color(1, 1, 1, 0.1)
-static var select_layer_color: Color = Color.PALE_GOLDENROD
+static var select_layer_color: Color = Color(1, 1, 1, 0.5)
 
 
 #============================================================
@@ -56,12 +56,12 @@ func _draw() -> void:
 	if not ProjectData.has_layer(layer_id):
 		return
 	
-	var offset_p = Vector2()
-	offset_p.x = ProjectData.get_current_frame_point() * SPACE_WIDTH + 1
+	var offset_point = Vector2()
+	offset_point.x = ProjectData.get_current_frame_point() * SPACE_WIDTH + 1
 	
 	# 高亮编辑的层
 	if ProjectData.is_select_layer(layer_id):
-		draw_rect( Rect2(offset_p, Vector2(40, 40) - Vector2(1,1)), select_layer_color, true)
+		draw_rect( Rect2(offset_point, Vector2(40, 40) - Vector2(1,1)), select_layer_color, true)
 	
 	# 绘制缩略图
 	var count : int = ceili((size.x-_frame_image_size) / 24)
@@ -82,7 +82,7 @@ func _draw() -> void:
 			break
 	
 	# 绘制帧边框
-	draw_rect( Rect2(offset_p, Vector2(40, 40) - Vector2(1,1)), select_frame_color, true)
+	draw_rect( Rect2(offset_point, Vector2(40, 40) - Vector2(1,1)), select_frame_color, true)
 	
 
 

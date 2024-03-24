@@ -16,6 +16,8 @@ signal draw_finished()
 
 
 var _drawn_points_color : Dictionary = {} # 已绘制到的点位颜色
+var _shift_direction : Vector2 = Vector2.ZERO # 按住 shift 绘制的线的方向
+var _last_shift_pos : Vector2 = Vector2()
 
 
 #============================================================
@@ -28,16 +30,52 @@ func _init() -> void:
 #============================================================
 #  自定义
 #============================================================
-func _pressed():
+func _pressed(button_index):
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	_shift_direction = Vector2()
+	_last_shift_pos = Vector2()
 	_drawn_points_color.clear()
 	ready_draw.emit()
 
 
-func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
+
+func _press_moving(last_point: Vector2, current_point: Vector2) -> void:
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	
+	if Input.is_key_pressed(KEY_SHIFT):
+		# 如果按着 shift 键绘制直线
+		if _shift_direction == Vector2.ZERO:
+			var diff = current_point - get_last_pressed_point()
+			if diff.length() < 6:
+				return
+			_shift_direction = diff.normalized()
+			_last_shift_pos = get_last_pressed_point()
+			return
+		
+		var diff = current_point - get_last_pressed_point()
+		var d = diff.normalized().dot(_shift_direction)
+		var total = diff.length()
+		var offset = (_shift_direction * total).round()
+		if d > 0:
+			# 同方向
+			current_point = get_last_pressed_point() + offset
+		else:
+			# 反方向
+			current_point = get_last_pressed_point() - offset
+		
+		# 上次位置
+		last_point = _last_shift_pos
+		if int(total) % 4 == 0:
+			_last_shift_pos = current_point
+	
+	# 绘制
+	var pen_shape_type = ProjectData.get_config(PropertyName.PEN.SHAPE)
 	var pen_line_width = ProjectData.get_config(PropertyName.PEN.LINE_WIDTH)
 	var pen_color = ProjectData.get_config(PropertyName.PEN.COLOR)
-	var points = DrawDataUtil.get_line_points(last_point, current_point)
-	var draw_data = DrawDataUtil.create_stroke_points(0, pen_line_width, image_rect, points, _drawn_points_color)
+	var line_points = CanvasUtil.get_line_points(Vector2i(last_point), Vector2(current_point))
+	var draw_data = CanvasUtil.create_stroke_points(pen_shape_type, pen_line_width, image_rect, line_points, _drawn_points_color)
 	for point in draw_data:
 		draw_data[point] = pen_color
 		_drawn_points_color[point] = null
@@ -45,5 +83,8 @@ func _press_move(last_point: Vector2i, current_point: Vector2i) -> void:
 		drawn.emit(draw_data)
 
 
-func _released():
+func _released(button_index):
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	
 	draw_finished.emit()

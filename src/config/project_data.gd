@@ -17,11 +17,28 @@ const THUMBNAILS_SIZE = Vector2i(40, 40)
 const DEFAULT_INT = -10000000
 
 
+
 #============================================================
 #  内置
 #============================================================
 func _init() -> void:
 	init_property_name()
+	#Engine.get_main_loop().node_added.connect(
+		#func(node):
+			#if node is BaseButton:
+				#node.focus_mode = Control.FOCUS_NONE
+	#)
+	Engine.get_main_loop().root.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
+	
+	# 默认配置
+	set_config(PropertyName.KEY.IMAGE_RECT, Rect2i(0, 0, 256, 256))
+	
+	set_config(PropertyName.PEN.LINE_WIDTH, 1)
+	set_config(PropertyName.PEN.SHAPE, PropertyName.SHAPE.CIRCLE)
+	set_config(PropertyName.PEN.COLOR, Color.WHITE)
+	
+	set_config(PropertyName.ERASER.SIZE, 1)
+	set_config(PropertyName.ERASER.SHAPE, PropertyName.SHAPE.CIRCLE)
 
 
 #============================================================
@@ -34,14 +51,17 @@ signal config_changed(property:String, last_value, value)
 var _config_data: Dictionary = {} # 配置数据
 var _listen_property_callback: Dictionary = {} # 监听属性改变
 
-func set_config(property: String, value):
+
+# 用这个而不用静态变量设置属性数据，原因是因为静态变量不能发出信号，不好控制数据变化时的操作
+func set_config(property: String, value, emit_change_signal: bool = true):
 	var last_value = _config_data.get(property)
 	if typeof(last_value) != typeof(value) or last_value != value:
 		_config_data[property] = value
 		if _listen_property_callback.has(property):
 			for method:Callable in _listen_property_callback[property]:
 				method.call(last_value, value)
-		config_changed.emit(property, last_value, value)
+		if emit_change_signal:
+			config_changed.emit(property, last_value, value)
 
 func get_config(property, default = null):
 	if _config_data.has(property):
@@ -55,6 +75,24 @@ func listen_config(property: String, method: Callable):
 	if not _listen_property_callback.has(property):
 		_listen_property_callback[property] = []
 	_listen_property_callback[property].append(method)
+
+
+## 激活使用的工具
+func active_tool(tool_name: String):
+	# Tools 监听这个属性会自动切换使用的工具
+	if tool_name.contains("/"):
+		tool_name = tool_name.get_file()
+	set_config(PropertyName.KEY.CURRENT_TOOL, tool_name)
+
+## 获取当前工具名称
+func get_current_tool_name():
+	return get_config(PropertyName.KEY.CURRENT_TOOL)
+
+## 获取画布缩放
+func get_canvas_scale() -> Vector2:
+	var canvas_zoom = get_config(PropertyName.KEY.CANVAS_ZOOM, 0)
+	var v = pow(1.15, canvas_zoom)
+	return Vector2(v, v)
 
 
 ## 更新 PropertyName 子类的静态变量的值为自身的名称
@@ -116,7 +154,7 @@ func get_stroke_points(size) -> Array:
 #============================================================
 #  菜单功能
 #============================================================
-signal new_file()
+signal newly_file()
 
 var menu : SimpleMenu
 var undo_redo : UndoRedo = UndoRedo.new()
@@ -140,7 +178,10 @@ func menu_new():
 	_selected_layer_ids.clear()
 	_id_to_thumbnails.clear()
 	
-	new_file.emit()
+	set_config(PropertyName.KEY.IMAGE_RECT, get_config(PropertyName.KEY.IMAGE_RECT, Rect2i(0, 0, 256, 256)) )
+	
+	newly_file.emit()
+	
 
 
 func menu_undo():
@@ -245,7 +286,7 @@ func add_image_colors(layer_id, frame_id, data: Dictionary, offset: Vector2i = V
 	var texture = get_image_texture(layer_id, frame_id)
 	var image = texture.get_image()
 	var image_colors : Dictionary = get_image_colors(layer_id, frame_id)
-	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	var image_rect : Rect2i = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT)
 	if offset == Vector2i.ZERO:
 		image_colors.merge(data, true)
 		for point in data:
@@ -262,10 +303,11 @@ func add_image_colors(layer_id, frame_id, data: Dictionary, offset: Vector2i = V
 	texture.update(image)
 	update_texture( layer_id, frame_id, texture)
 
+## 追加 texture 到这个图像数据上
 func add_image_texture(layer_id, frame_id, texture: Texture2D, offset: Vector2i = Vector2i.ZERO):
 	var image = texture.get_image()
 	var image_colors : Dictionary = get_image_colors(layer_id, frame_id)
-	var image_rect : Rect2i = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	var image_rect : Rect2i = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT)
 	# 合并
 	var frame_texture = get_image_texture(layer_id, frame_id)
 	var frame_image = frame_texture.get_image()
@@ -295,6 +337,75 @@ func add_image_texture(layer_id, frame_id, texture: Texture2D, offset: Vector2i 
 func update_image_colors(layer_id: float, frame_id: float, colors: Dictionary):
 	var data : Dictionary = get_image_data(layer_id, frame_id)
 	data[PropertyName.KEY.COLORS] = colors
+
+## 添加新的图片
+func new_texture(layer_id: float, frame_id: float, texture: ImageTexture = null):
+	var image_size : Vector2i = get_config(PropertyName.KEY.IMAGE_RECT).size
+	if texture == null:
+		texture = _layer_frame_to_image_data[layer_id] \
+			.get(frame_id, {}) \
+			.get(PropertyName.KEY.TEXTURE, null)
+		if texture == null:
+			var image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
+			texture = ImageTexture.create_from_image(image)
+	
+	if not _layer_frame_to_image_data.has(layer_id):
+		_layer_frame_to_image_data[layer_id] = {}
+	
+	if not _layer_frame_to_image_data[layer_id].has(frame_id):
+		var data : Dictionary = {
+			PropertyName.KEY.LAYER_ID: layer_id,
+			PropertyName.KEY.FRAME_ID: frame_id,
+			PropertyName.KEY.TEXTURE: texture,
+			PropertyName.KEY.COLORS: {},
+		}
+		_layer_frame_to_image_data[layer_id][frame_id] = data
+	else:
+		_layer_frame_to_image_data[layer_id][frame_id][PropertyName.KEY.TEXTURE] = texture
+
+
+## 更新贴图数据
+func update_texture(layer_id: float, frame_id: float, texture: ImageTexture):
+	var data = get_image_data(layer_id, frame_id)
+	data[PropertyName.KEY.TEXTURE] = texture
+	_update_thumbnails(layer_id, frame_id, texture)
+	texture_changed.emit(layer_id, frame_id, texture)
+
+func _update_thumbnails(layer_id: float, frame_id: float, texture: ImageTexture = null):
+	if texture == null:
+		texture = get_image_texture(layer_id, frame_id).duplicate(true)
+	else:
+		texture = texture.duplicate(true)
+	texture.set_size_override( THUMBNAILS_SIZE )
+	if not _id_to_thumbnails.has(layer_id):
+		_id_to_thumbnails[layer_id] = {}
+	_id_to_thumbnails[layer_id][frame_id] = texture
+
+## 获取缩略图
+func get_thumbnails(layer_id: float, frame_id: float) -> ImageTexture:
+	if not _id_to_thumbnails.has(layer_id) or not _id_to_thumbnails[layer_id].has(frame_id):
+		_update_thumbnails(layer_id, frame_id)
+	return _id_to_thumbnails[layer_id][frame_id]
+
+## 获取这个帧上的图片
+func get_frame_image(frame_id) -> Image:
+	var image_rect : Rect2i = get_config(PropertyName.KEY.IMAGE_RECT)
+	var image : Image = CanvasUtil.create_image(image_rect.size)
+	for layer_id in get_layer_ids():
+		var texture = get_image_texture( layer_id, frame_id )
+		var _image = texture.get_image()
+		image.blend_rect( texture.get_image(), image_rect, Vector2() )
+	return image
+
+## 获取当前帧的图片
+func get_current_frame_image() -> Image:
+	var frame_id = get_current_frame_id()
+	return get_frame_image(frame_id)
+
+
+#============================================================
+#  层级帧
+#============================================================
 
 func get_max_layer_id() -> float:
 	return _auto_incr_layer_id
@@ -429,55 +540,6 @@ func remove_frame(frame_id: float) -> bool:
 		return true
 	return false
 
-## 添加新的图片
-func new_texture(layer_id: float, frame_id: float, texture: ImageTexture = null):
-	var image_size : Vector2i = get_config(PropertyName.IMAGE.RECT).size
-	if texture == null:
-		texture = _layer_frame_to_image_data[layer_id] \
-			.get(frame_id, {}) \
-			.get(PropertyName.KEY.TEXTURE, null)
-		if texture == null:
-			var image = Image.create(image_size.x, image_size.y, true, Image.FORMAT_RGBA8)
-			texture = ImageTexture.create_from_image(image)
-	
-	if not _layer_frame_to_image_data.has(layer_id):
-		_layer_frame_to_image_data[layer_id] = {}
-	
-	if not _layer_frame_to_image_data[layer_id].has(frame_id):
-		var data : Dictionary = {
-			PropertyName.KEY.LAYER_ID: layer_id,
-			PropertyName.KEY.FRAME_ID: frame_id,
-			PropertyName.KEY.TEXTURE: texture,
-			PropertyName.KEY.COLORS: {},
-		}
-		_layer_frame_to_image_data[layer_id][frame_id] = data
-	else:
-		_layer_frame_to_image_data[layer_id][frame_id][PropertyName.KEY.TEXTURE] = texture
-
-
-## 更新贴图数据
-func update_texture(layer_id: float, frame_id: float, texture: ImageTexture):
-	var data = get_image_data(layer_id, frame_id)
-	data[PropertyName.KEY.TEXTURE] = texture
-	_update_thumbnails(layer_id, frame_id, texture)
-	texture_changed.emit(layer_id, frame_id, texture)
-
-func _update_thumbnails(layer_id: float, frame_id: float, texture: ImageTexture = null):
-	if texture == null:
-		texture = get_image_texture(layer_id, frame_id).duplicate(true)
-	else:
-		texture = texture.duplicate(true)
-	texture.set_size_override( THUMBNAILS_SIZE )
-	if not _id_to_thumbnails.has(layer_id):
-		_id_to_thumbnails[layer_id] = {}
-	_id_to_thumbnails[layer_id][frame_id] = texture
-
-## 获取缩略图
-func get_thumbnails(layer_id: float, frame_id: float) -> ImageTexture:
-	if not _id_to_thumbnails.has(layer_id) or not _id_to_thumbnails[layer_id].has(frame_id):
-		_update_thumbnails(layer_id, frame_id)
-	return _id_to_thumbnails[layer_id][frame_id]
-
 ## 添加选中的层
 func add_select_layer(layer_id: float) -> bool:
 	if not _selected_layer_ids.has(layer_id):
@@ -549,3 +611,4 @@ func offset_current_frame(offset: int):
 	elif frame_point >= get_frame_count():
 		frame_point = get_frame_count() - 1
 	update_current_frame_by_point(frame_point)
+

@@ -46,6 +46,6 @@ func _ready():
 	check_box.pressed.connect(_pressed)
 
 
-func _pressed():
+func _pressed(button_index):
 	pressed.emit()
 

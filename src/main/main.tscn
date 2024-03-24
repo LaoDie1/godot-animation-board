@@ -3,36 +3,20 @@
 [ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
 [ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
 [ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/canvas_container/canvas_container.tscn" id="3_3liki"]
+[ext_resource type="PackedScene" uid="uid://3r4cfyureajl" path="res://src/main/component/toolbar/toolbar.tscn" id="3_mk23h"]
 [ext_resource type="Script" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
-[ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/pen_setting.tscn" id="6_ge575"]
+[ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/panels/setting_panel/pen_setting.tscn" id="6_ge575"]
+[ext_resource type="PackedScene" uid="uid://cyy6u8mpf4ld5" path="res://src/main/panels/setting_panel/eraser_setting.tscn" id="7_7y26s"]
+[ext_resource type="PackedScene" uid="uid://2tpo4wrw11te" path="res://src/main/panels/export_panel/export_panel.tscn" id="7_e50gr"]
 [ext_resource type="PackedScene" uid="uid://ccvi3ga25277e" path="res://src/main/image_layer_timeline/image_layer_timeline.tscn" id="7_i4wsq"]
+[ext_resource type="PackedScene" uid="uid://dvsqj01rqrg5o" path="res://src/main/panels/setting_panel/canvas_setting.tscn" id="8_2pss8"]
+[ext_resource type="PackedScene" uid="uid://codgtaqt0klvt" path="res://src/main/panels/new_project_panel/new_project_panel.tscn" id="11_alrgo"]
 
-[sub_resource type="InputEventKey" id="InputEventKey_s26vr"]
-device = -1
-keycode = 80
-unicode = 112
-
-[sub_resource type="Shortcut" id="Shortcut_o7n6u"]
-events = [SubResource("InputEventKey_s26vr")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_svnjd"]
-device = -1
-keycode = 69
-unicode = 101
-
-[sub_resource type="Shortcut" id="Shortcut_08v0l"]
-events = [SubResource("InputEventKey_svnjd")]
-
-[sub_resource type="InputEventKey" id="InputEventKey_0bfty"]
-device = -1
-keycode = 86
-unicode = 118
-
-[sub_resource type="Shortcut" id="Shortcut_3im42"]
-events = [SubResource("InputEventKey_0bfty")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1t64f"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+expand_margin_top = 36.0
 
 [node name="Main" type="Control"]
-texture_filter = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -89,85 +73,99 @@ size_flags_vertical = 3
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+split_offset = 80
 
-[node name="drawing_toolbar" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
-custom_minimum_size = Vector2(70, 0)
+[node name="LeftSection" type="Control" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
+metadata/_edit_lock_ = true
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/LeftSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/LeftSection/PanelContainer"]
 layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
 
-[node name="tool_button_container" type="BoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer"]
+[node name="Toolbar" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/LeftSection/PanelContainer/MarginContainer" instance=ExtResource("3_mk23h")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-vertical = true
 
-[node name="pen" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-toggle_mode = true
-shortcut = SubResource("Shortcut_o7n6u")
-text = "Pen"
-
-[node name="eraser" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-toggle_mode = true
-shortcut = SubResource("Shortcut_08v0l")
-text = "Eraser"
-
-[node name="move" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-toggle_mode = true
-shortcut = SubResource("Shortcut_3im42")
-text = "Move"
-
-[node name="line" type="Button" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/drawing_toolbar/ScrollContainer/tool_button_container"]
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-toggle_mode = true
-text = "Line"
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/LeftSection"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = 6.0
+grow_horizontal = 0
+grow_vertical = 2
 
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer"]
 layout_mode = 2
-split_offset = -300
+split_offset = 150
+metadata/_edit_lock_ = true
 
-[node name="ScrollContainer" type="Control" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
+[node name="MiddleSection" type="Control" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
+unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
+metadata/_edit_lock_ = true
 
-[node name="CanvasContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/ScrollContainer" instance=ExtResource("3_3liki")]
+[node name="CanvasContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/MiddleSection" instance=ExtResource("3_3liki")]
 unique_name_in_owner = true
-layout_mode = 2
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_right = 750.0
-offset_bottom = 420.0
+layout_mode = 1
 focus_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
+[node name="RightSection" type="Control" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Pen" type="ScrollContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer"]
 layout_mode = 2
 
-[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer"]
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 tab_focus_mode = 0
 
-[node name="PenSetting" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer" instance=ExtResource("6_ge575")]
-layout_mode = 2
-
-[node name="LayerButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/PanelContainer/TabContainer"]
+[node name="ImageLayers" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 script = ExtResource("5_lepq6")
+
+[node name="Pen" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("6_ge575")]
+visible = false
+layout_mode = 2
+
+[node name="Eraser" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("7_7y26s")]
+visible = false
+layout_mode = 2
+
+[node name="Canvas" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/TabContainer" instance=ExtResource("8_2pss8")]
+visible = false
+layout_mode = 2
 
 [node name="ImageLayerTimeline" parent="MarginContainer/VBoxContainer/VSplitContainer" instance=ExtResource("7_i4wsq")]
 unique_name_in_owner = true
@@ -184,5 +182,45 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="ExportWindow" type="Window" parent="."]
+unique_name_in_owner = true
+use_taa = true
+canvas_item_default_texture_filter = 0
+mode = 4
+title = "Export"
+position = Vector2i(50, 80)
+size = Vector2i(800, 500)
+visible = false
+transient = true
+exclusive = true
+theme_override_constants/title_height = 38
+theme_override_constants/close_h_offset = 30
+theme_override_constants/close_v_offset = 25
+theme_override_styles/embedded_border = SubResource("StyleBoxFlat_1t64f")
+
+[node name="ExportPanel" parent="ExportWindow" instance=ExtResource("7_e50gr")]
+unique_name_in_owner = true
+
+[node name="NewProjectWindow" type="Window" parent="."]
+unique_name_in_owner = true
+title = "创建新项目"
+position = Vector2i(50, 80)
+size = Vector2i(600, 500)
+visible = false
+
+[node name="NewProjectPanel" parent="NewProjectWindow" instance=ExtResource("11_alrgo")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [connection signal="menu_pressed" from="MarginContainer/VBoxContainer/SimpleMenu" to="." method="_on_simple_menu_menu_pressed"]
 [connection signal="play_state_changed" from="MarginContainer/VBoxContainer/VSplitContainer/ImageLayerTimeline" to="." method="_on_image_layer_timeline_play_state_changed"]
+[connection signal="close_requested" from="ExportWindow" to="ExportWindow" method="hide"]
+[connection signal="close_requested" from="ExportWindow/ExportPanel" to="ExportWindow" method="hide"]
+[connection signal="close_requested" from="NewProjectWindow" to="NewProjectWindow" method="hide"]
+[connection signal="cancel" from="NewProjectWindow/NewProjectPanel" to="NewProjectWindow" method="hide"]
+[connection signal="created" from="NewProjectWindow/NewProjectPanel" to="." method="_on_new_project_panel_created"]

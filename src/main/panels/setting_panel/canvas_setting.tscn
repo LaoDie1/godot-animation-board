@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvsqj01rqrg5o"]
+
+[ext_resource type="Script" path="res://src/main/panels/setting_panel/canvas_setting.gd" id="1_i8xgf"]
+
+[node name="CanvasSetting" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_i8xgf")
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "背景颜色:"
+
+[node name="BackgroundColorButton" type="ColorPickerButton" parent="GridContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+color = Color(0.682353, 0.682353, 0.682353, 1)
+
+[connection signal="color_changed" from="GridContainer/BackgroundColorButton" to="." method="_on_background_color_button_color_changed"]

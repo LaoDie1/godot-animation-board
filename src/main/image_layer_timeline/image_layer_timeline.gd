@@ -41,14 +41,14 @@ signal play_state_changed(state)
 
 var _coords_to_images : Dictionary = {}
 var _layer_id_to_frame_track : Dictionary = {}
-var _play_status : int = PAUSE:
+var _play_state : int = PAUSE:
 	set(v):
 		var state = clampi(v, PLAY_FORWARD, PLAY_BACKWARD)
-		if _play_status != state:
-			_play_status = state
-			set_process(_play_status != PAUSE)
-			play_state_changed.emit(_play_status)
-			if _play_status == PAUSE:
+		if _play_state != state:
+			_play_state = state
+			set_process(_play_state != PAUSE)
+			play_state_changed.emit(_play_state)
+			if _play_state == PAUSE:
 				play_button.icon = theme.get("EditorIcons/icons/Play")
 			else:
 				play_button.icon = theme.get("EditorIcons/icons/Pause")
@@ -60,7 +60,7 @@ var _play_time : float = 0.0
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.new_file.connect(
+	ProjectData.newly_file.connect(
 		func():
 			offset_frame = 0
 			for frame_id in _layer_id_to_frame_track:
@@ -78,7 +78,7 @@ func _init() -> void:
 		func(layer_id):
 			var frame_track_item : Control = _layer_id_to_frame_track[layer_id]
 			frame_track_item.get_parent().remove_child(frame_track_item)
-			update_delete_status()
+			update_delete_state()
 	)
 	ProjectData.removed_frame.connect(
 		func(frame_id):
@@ -112,10 +112,10 @@ func _process(delta: float) -> void:
 	if _play_time <= 0: # 到达间隔时间
 		_play_time = 0.25
 		var point = ProjectData.get_current_frame_point()
-		point += _play_status
-		if _play_status == PLAY_BACKWARD and point >= ProjectData.get_frame_count():
+		point += _play_state
+		if _play_state == PLAY_BACKWARD and point >= ProjectData.get_frame_count():
 			point = 0
-		elif _play_status == PLAY_FORWARD and point < 0:
+		elif _play_state == PLAY_FORWARD and point < 0:
 			point = ProjectData.get_frame_count() - 1
 		ProjectData.update_current_frame_by_point(point)
 
@@ -128,7 +128,7 @@ func get_frame_track(layer_id: float) -> FrameTrack:
 	var frame_track : FrameTrack = frame_item.get_node("FrameTrack")
 	return frame_track
 
-func update_delete_status():
+func update_delete_state():
 	if ProjectData.get_layer_count() > 1:
 		for item in _layer_id_to_frame_track.values():
 			item.get_node("Delete").disabled = false
@@ -158,8 +158,9 @@ func create_layer(layer_id: float):
 	
 	# 删除按钮
 	var btn_delete = item.get_node("Delete") as Button
-	btn_delete.pressed.connect(ProjectData.remove_layer.bind(layer_id))
-	update_delete_status()
+	if not btn_delete.pressed.is_connected(ProjectData.remove_layer):
+		btn_delete.pressed.connect(ProjectData.remove_layer.bind(layer_id))
+	update_delete_state()
 	
 	# 轨道帧
 	var frame_track : FrameTrack = get_frame_track(layer_id)
@@ -188,7 +189,7 @@ func _on_new_frame_pressed() -> void:
 	ProjectData.menu_add_frame()
 
 func _on_onionskin_toggled(toggled_on: bool) -> void:
-	ProjectData.set_config(PropertyName.TOOL.ONIONSKIN, toggled_on)
+	ProjectData.set_config(PropertyName.KEY.ONIONSKIN, toggled_on)
 
 func _on_insert_frame_pressed() -> void:
 	ProjectData.menu_insert_frame()
@@ -197,18 +198,18 @@ func _on_insert_frame_pressed() -> void:
 var _played_frame_point : int = -1
 func _on_play_pressed() -> void:
 	if ProjectData.get_frame_count() > 1:
-		if _play_status == PAUSE:
-			_play_status = PLAY_BACKWARD
+		if _play_state == PAUSE:
+			_play_state = PLAY_BACKWARD
 			_played_frame_point = ProjectData.get_current_frame_point()
 		else:
-			_play_status = PAUSE
+			_play_state = PAUSE
 
 
 func _on_stop_pressed() -> void:
 	if _played_frame_point != -1:
 		ProjectData.update_current_frame_by_point(_played_frame_point)
 		_played_frame_point = -1
-		_play_status = PAUSE
+		_play_state = PAUSE
 
 
 func _on_remove_frame_pressed() -> void:

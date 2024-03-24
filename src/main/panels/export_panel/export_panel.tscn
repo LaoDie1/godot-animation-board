@@ -1,0 +1,296 @@
+[gd_scene load_steps=8 format=3 uid="uid://2tpo4wrw11te"]
+
+[ext_resource type="Script" path="res://src/main/panels/export_panel/export_panel.gd" id="1_0uiu7"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_sowro"]
+device = -1
+alt_pressed = true
+keycode = 69
+
+[sub_resource type="Shortcut" id="Shortcut_vdf40"]
+events = [SubResource("InputEventKey_sowro")]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bgukx"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_pylnv"]
+device = -1
+alt_pressed = true
+keycode = 67
+
+[sub_resource type="InputEventKey" id="InputEventKey_db4vy"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_c7hdv"]
+events = [SubResource("InputEventKey_pylnv"), SubResource("InputEventKey_db4vy")]
+
+[node name="ExportPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0uiu7")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftSection" type="Control" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftSection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftSection/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CurrentFrameTextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftSection/VBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 1
+
+[node name="RightSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer2"]
+layout_mode = 2
+text = "导出到："
+
+[node name="ExportFilePathLineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "文件路径"
+
+[node name="ExportDialogButton" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer2"]
+layout_mode = 2
+text = "导出目录..."
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+text = "导出类型："
+
+[node name="TypeOptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ExportSettingTabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 1
+tabs_visible = false
+
+[node name="CurrentImage" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer"]
+visible = false
+layout_mode = 2
+metadata/_edit_group_ = true
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/CurrentImage"]
+layout_mode = 2
+text = "Current Image"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/CurrentImage"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/CurrentImage/MarginContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="SingleImage" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer"]
+layout_mode = 2
+metadata/_edit_group_ = true
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SingleImage"]
+layout_mode = 2
+text = "Single Image"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SingleImage"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SingleImage/MarginContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="SpriteFrames" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer"]
+visible = false
+layout_mode = 2
+focus_mode = 1
+metadata/_edit_group_ = true
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteFrames"]
+layout_mode = 2
+text = "Sprite Frames"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteFrames"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteFrames/MarginContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="SpriteSheet" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer"]
+visible = false
+layout_mode = 2
+metadata/_edit_group_ = true
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet"]
+layout_mode = 2
+text = "Sprite Sheet"
+horizontal_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer"]
+layout_mode = 2
+text = "列数："
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+value = 5.0
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer"]
+layout_mode = 2
+text = "间距："
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer/HBoxContainer"]
+layout_mode = 2
+text = "左右 "
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+suffix = "px"
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer/HBoxContainer"]
+layout_mode = 2
+text = "上下 "
+
+[node name="SpinBox3" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/ExportSettingTabContainer/SpriteSheet/MarginContainer2/GridContainer/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+suffix = "px"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection"]
+layout_mode = 2
+alignment = 1
+
+[node name="Export" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+shortcut = SubResource("Shortcut_vdf40")
+text = "Export (E)"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 32
+theme_override_styles/separator = SubResource("StyleBoxEmpty_bgukx")
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+shortcut = SubResource("Shortcut_c7hdv")
+text = "Close (C)"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ExportFileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+position = Vector2i(50, 70)
+size = Vector2i(550, 350)
+ok_button_text = "保存"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer2/ExportDialogButton" to="ExportFileDialog" method="popup"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/HSplitContainer/RightSection/ScrollContainer/GridContainer/HBoxContainer/TypeOptionButton" to="." method="_on_type_option_button_item_selected"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer/Export" to="." method="_on_export_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HSplitContainer/RightSection/HBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]
+[connection signal="file_selected" from="ExportFileDialog" to="." method="_on_export_file_dialog_file_selected"]

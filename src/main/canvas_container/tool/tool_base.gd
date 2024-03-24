@@ -20,38 +20,39 @@ var image_rect : Rect2i
 #============================================================
 #  自定义
 #============================================================
-func get_last_pressed_point() -> Vector2i:
+func _pressed(button_index: int):
+	pass
+
+func _press_moving(last_point: Vector2, current_point: Vector2):
+	pass
+
+func _released(button_index):
+	pass
+
+func _rolling(direction: Vector2, factor: float):
+	pass
+
+
+func get_last_button_index() -> int:
+	return input_board._last_button_index
+
+func get_last_pressed_point() -> Vector2:
 	return input_board.get_last_pressed_point()
 
-func get_current_point() -> Vector2i:
-	return Vector2i(input_board.get_local_mouse_position())
-
+func get_current_point() -> Vector2:
+	return input_board.get_local_mouse_position()
 
 ## 激活工具
 func active():
 	input_board.pressed.connect(_pressed)
-	input_board.press_move.connect(_press_move)
+	input_board.press_moving.connect(_press_moving)
 	input_board.released.connect(_released)
-
+	input_board.rolling.connect(_rolling)
 
 ## 取消激活工具
 func deactive():
 	input_board.pressed.disconnect(_pressed)
-	input_board.press_move.disconnect(_press_move)
+	input_board.press_moving.disconnect(_press_moving)
 	input_board.released.disconnect(_released)
+	input_board.rolling.disconnect(_rolling)
 
-
-
-#============================================================
-#  连接信号
-#============================================================
-func _pressed():
-	pass
-
-
-func _press_move(last_point: Vector2i, current_point: Vector2i):
-	pass
-
-
-func _released():
-	pass

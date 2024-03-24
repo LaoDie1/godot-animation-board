@@ -1,0 +1,129 @@
+[gd_scene load_steps=4 format=3 uid="uid://codgtaqt0klvt"]
+
+[ext_resource type="Script" path="res://src/main/panels/new_project_panel/new_project_panel.gd" id="1_2rh2s"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_a7r7e"]
+device = -1
+keycode = 4194309
+physical_keycode = 4194309
+key_label = 4194309
+
+[sub_resource type="Shortcut" id="Shortcut_3tuqn"]
+events = [SubResource("InputEventKey_a7r7e")]
+
+[node name="NewProjectPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 623.0
+offset_bottom = 477.0
+script = ExtResource("1_2rh2s")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Size" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Size"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer"]
+layout_mode = 2
+text = "图像大小"
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+text = "宽度："
+
+[node name="CanvasWidth" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 16384.0
+value = 80.0
+select_all_on_focus = true
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer/MarginContainer/GridContainer"]
+layout_mode = 2
+text = "高度："
+
+[node name="CanvasHeight" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Size/VBoxContainer/PanelContainer/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 16384.0
+value = 80.0
+select_all_on_focus = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CreateButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 50)
+layout_mode = 2
+shortcut = SubResource("Shortcut_3tuqn")
+text = "Create"
+
+[node name="Control2" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 50)
+layout_mode = 2
+text = "Cancel"
+
+[node name="Control3" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/CreateButton" to="." method="_on_create_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_cancel_button_pressed"]

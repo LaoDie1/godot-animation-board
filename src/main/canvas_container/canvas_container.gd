@@ -16,53 +16,76 @@ extends Control
 @onready var move_image_ref: ReferenceRect = %MoveImageRef
 @onready var onionskin: Control = %Onionskin # 洋葱皮节点
 @onready var line: Line2D = %Line
+@onready var canvas: Control = %Canvas
+@onready var canvas_border: ReferenceRect = %CanvasBorder
+@onready var canvas_zoom_label: Label = %CanvasZoomLabel
+@onready var background_panel: ColorRect = %BackgroundPanel
+@onready var canavs_margin_container: MarginContainer = %CanavsMarginContainer
 
 
 var _image_rect : Rect2i = Rect2i()
 var _layer_id_to_layer_node : Dictionary = {} # ID 对应的层级节点
 var _current_tool : ToolBase # 当前使用的工具
+var _middle_pressed_mouse_pos : Vector2 = Vector2(-1, -1) # 中键按下时的鼠标位置
+var _middle_pressed_canvas_pos : Vector2 = Vector2() # 中键按下时画布所在位置
+var _last_canvas_zoom_change_time = 0 # 上次画布缩放时的时间
 
 
 #============================================================
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.listen_config(PropertyName.IMAGE.RECT, func(last_rect, image_rect):
+	ProjectData.listen_config(PropertyName.KEY.CANVAS_BACKGROUND_COLOR, func(last, curr):
+		background_panel.color = curr
+	)
+	ProjectData.listen_config(PropertyName.KEY.IMAGE_RECT, func(last_rect, image_rect):
 		if typeof(last_rect) == TYPE_NIL:
 			last_rect = Rect2i()
 		var last_image_size : Vector2i = last_rect.size
 		var image_size : Vector2i = image_rect.size
-		var max_size : Vector2i 
-		if typeof(last_image_size) != TYPE_NIL:
-			max_size = Vector2i(
-				max(last_image_size.x, image_size.x),
-				max(last_image_size.y, image_size.y),
-			)
-		else:
-			max_size = image_size
 		
-		_image_rect = Rect2i(Vector2i(), max_size)
-		custom_minimum_size = max_size
-		input_board.custom_minimum_size = max_size
+		_image_rect = Rect2i(Vector2i(), image_size)
+		input_board.custom_minimum_size = image_size
+		input_board.size = image_size
+		canavs_margin_container.custom_minimum_size = image_size
+		canavs_margin_container.size = image_size
 		
 		# 更新节点
 		for tool:ToolBase in tools.get_children():
 			tool.image_rect = _image_rect
+		
 	)
-	ProjectData.listen_config(PropertyName.TOOL.CURRENT, func(last, current):
-		tools.active_tool(current)
+	ProjectData.listen_config(PropertyName.KEY.CURRENT_TOOL, func(last, curr: String):
+		match curr.to_lower():
+			"move":
+				input_board.mouse_default_cursor_shape = Control.CURSOR_MOVE
+			_:
+				input_board.mouse_default_cursor_shape = Control.CURSOR_ARROW
+		
 	)
-	ProjectData.new_file.connect(
+	ProjectData.newly_file.connect(
 		func():
 			for layer_id in _layer_id_to_layer_node:
 				_layer_id_to_layer_node[layer_id].queue_free()
 			_layer_id_to_layer_node.clear()
-			tools.active_tool(PropertyName.TOOL.PEN)
 	)
 	ProjectData.newly_layer.connect(create_layer, Object.CONNECT_DEFERRED)
 	ProjectData.removed_layer.connect(
 		func(layer_id):
 			_layer_id_to_layer_node[layer_id].visible = false
+	)
+	ProjectData.listen_config(PropertyName.KEY.CANVAS_ZOOM, func(last, canvas_zoom):
+		var last_pos = canvas.get_local_mouse_position()
+		canvas.scale = ProjectData.get_canvas_scale()
+		canvas_border.border_width = pow(1.15, -canvas_zoom ) * 4
+		canvas_zoom_label.text = str(canvas_zoom)
+		
+		# 位置偏移。正确偏移到鼠标位置的点
+		var current_pos = canvas.get_local_mouse_position()
+		var offset = current_pos - last_pos
+		if offset > canvas.size:
+			offset = canvas.size
+		canvas.position += offset * canvas.scale
 	)
 
 
@@ -71,7 +94,41 @@ func _ready() -> void:
 	move_image_ref.visible = false
 	# 工具
 	tools.set_input_board(input_board)
-	tools.active_tool(PropertyName.TOOL.PEN)
+	# 画布缩放
+	ProjectData.set_config(PropertyName.KEY.CANVAS_ZOOM, 0)
+
+
+func _gui_input(event: InputEvent) -> void:
+	# 缩放拖动画布
+	if event is InputEventMouseMotion:
+		if _middle_pressed_mouse_pos != Vector2(-1, -1):
+			var diff = get_local_mouse_position() - _middle_pressed_mouse_pos
+			canvas.position = _middle_pressed_canvas_pos + diff
+	
+	elif event is InputEventMouseButton:
+		if event.pressed:
+			var dir = 0
+			match event.button_index:
+				MOUSE_BUTTON_WHEEL_DOWN: 
+					dir = 1
+				MOUSE_BUTTON_WHEEL_UP: 
+					dir = -1
+				MOUSE_BUTTON_MIDDLE: 
+					_middle_pressed_mouse_pos = get_local_mouse_position()
+					_middle_pressed_canvas_pos = canvas.position
+			
+			if dir != 0:
+				# 缩放间隔时间需要超过 0.02 秒
+				if Time.get_ticks_msec() - _last_canvas_zoom_change_time > 20:
+					var canvas_zoom : float = ProjectData.get_config(PropertyName.KEY.CANVAS_ZOOM, 1)
+					var new_zoom = clampf(canvas_zoom - sign(dir), -20, 20) # 缩放范围 20
+					if new_zoom != canvas_zoom:
+						ProjectData.set_config(PropertyName.KEY.CANVAS_ZOOM, new_zoom)
+						_last_canvas_zoom_change_time = Time.get_ticks_msec()
+				
+		else:
+			_middle_pressed_mouse_pos = Vector2(-1, -1)
+		
 
 
 #============================================================
@@ -107,20 +164,24 @@ func update_canvas():
 			image_layer.load_data( layer_id, frame_id )
 
 
+
+#============================================================
+#  绘制
+#============================================================
 var _queue_draw_data : Dictionary
-var _queue_draw_data_status : bool = false
+var _queue_draw_data_state : bool = false
 ## 根据数据绘制
 func draw_by_data(data: Dictionary) -> void:
 	# 添加到绘制队列，不进行实时绘制，防止卡顿
 	_queue_draw_data = data
-	if _queue_draw_data_status:
+	if _queue_draw_data_state:
 		return
-	_queue_draw_data_status = true
+	_queue_draw_data_state = true
 	await Engine.get_main_loop().process_frame
 	# 绘制
 	for layer_id in ProjectData.get_select_layer_ids():
 		get_image_layer(layer_id).draw_color_by_data(_queue_draw_data)
-	_queue_draw_data_status = false
+	_queue_draw_data_state = false
 
 
 ## 根据 Texture2D 绘制
@@ -170,6 +231,7 @@ func draw_colors_data(colors_data: Dictionary):
 		false
 	)
 
+
 func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_layer_ids):
 	var colors : Dictionary
 	for layer_id in colors_data:
@@ -189,13 +251,13 @@ func __draw_colors(colors_data, layer_id_to_textures, current_frame_id, select_l
 #  连接信号
 #============================================================
 func _on_move_ready_move() -> void:
-	move_image_ref.position = Vector2(0, 0)
-	move_image_ref.size = ProjectData.get_config(PropertyName.IMAGE.RECT).size
+	move_image_ref.position = canvas.position
+	move_image_ref.size = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT).size
 	move_image_ref.visible = true
 
 
-func _on_move_move_position(last_point: Vector2i, current_point: Vector2i) -> void:
-	var offset : Vector2 = Vector2(current_point - input_board.get_last_pressed_point())
+func _on_move_move_position(last_point: Vector2, current_point: Vector2) -> void:
+	var offset : Vector2 = (current_point - input_board.get_last_pressed_point()).floor()
 	move_image_ref.position = offset
 
 
@@ -222,7 +284,7 @@ func _draw_finished() -> void:
 	draw_colors_data( _get_draw_colors_data())
 
 
-func _on_line_moved(last_point: Vector2i, current_point: Vector2i) -> void:
+func _on_line_moved(last_point: Vector2, current_point: Vector2) -> void:
 	line.visible = true
 	line.points = [
 		input_board.get_last_pressed_point(), current_point
@@ -239,3 +301,9 @@ func _on_line_released(colors: Dictionary) -> void:
 		}
 	draw_colors_data(data)
 	line.visible = false
+
+
+func _on_reset_canvas_zoom_button_pressed() -> void:
+	var pos = canvas.position
+	ProjectData.set_config(PropertyName.KEY.CANVAS_ZOOM, 0)
+	canvas.position = pos

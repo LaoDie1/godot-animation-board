@@ -24,12 +24,13 @@ var _image_texture : ImageTexture
 func _init() -> void:
 	ProjectData.config_changed.connect(
 		func(property, last_value, value):
-			if property == PropertyName.IMAGE.RECT:
+			if property == PropertyName.KEY.IMAGE_RECT:
 				self.size = value.size
 	)
+	focus_mode = Control.FOCUS_CLICK
 
 func _ready() -> void:
-	self.size = ProjectData.get_config(PropertyName.IMAGE.RECT).size
+	self.size = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT).size
 
 
 func _draw() -> void:
@@ -69,7 +70,7 @@ func set_offset_colors(offset: Vector2i):
 	ProjectData.update_image_colors(_last_layer_id, _last_frame_id, image_colors)
 	
 	# 图像颜色
-	var image_rect = ProjectData.get_config(PropertyName.IMAGE.RECT)
+	var image_rect = ProjectData.get_config(PropertyName.KEY.IMAGE_RECT)
 	var new_image = Image.create(image_rect.size.x, image_rect.size.y, true, Image.FORMAT_RGBA8)
 	var point : Vector2i
 	for x in _image.get_size().x:

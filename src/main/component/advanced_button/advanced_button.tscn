@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://cph5kpuucqs65"]
+
+[ext_resource type="Script" path="res://src/main/component/advanced_button/advanced_button.gd" id="1_3eeb8"]
+[ext_resource type="Texture2D" uid="uid://bhdua1mg6g2c7" path="res://icon.svg" id="2_kv0iw"]
+
+[node name="AdvancedButton" type="Control"]
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_3eeb8")
+texture = ExtResource("2_kv0iw")
+metadata/_edit_group_ = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.125
+anchor_top = 0.125
+anchor_right = 0.875
+anchor_bottom = 0.875
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_kv0iw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="PopupPromptLine" type="Line2D" parent="Control"]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-20, -20)
+points = PackedVector2Array(24, 20, 24, 24, 20, 24)
+width = 1.0

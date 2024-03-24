@@ -11,7 +11,7 @@ extends ToolBase
 
 signal pressed()
 signal released(drawn_points_color: Dictionary)
-signal moved(last_point: Vector2i, current_point: Vector2i)
+signal moved(last_point: Vector2, current_point: Vector2)
 
 
 var _drawn_points_color : Dictionary = {} # 已绘制到的点位颜色
@@ -28,19 +28,28 @@ func _init() -> void:
 #============================================================
 #  自定义
 #============================================================
-func _pressed():
+func _pressed(button_index):
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	
 	_drawn_points_color.clear()
 	pressed.emit()
 
 
-func _press_move(last_point: Vector2i, current_point: Vector2i):
+func _press_moving(last_point: Vector2, current_point: Vector2):
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	
 	moved.emit(last_point, current_point)
 
 
-func _released():
+func _released(button_index):
+	if get_last_button_index() != MOUSE_BUTTON_LEFT:
+		return
+	
 	var line_width = ProjectData.get_config(PropertyName.LINE.WIDTH)
-	var points = DrawDataUtil.get_line_points(get_last_pressed_point(), get_current_point())
-	var draw_data = DrawDataUtil.create_stroke_points(0, line_width, image_rect, points, _drawn_points_color)
+	var points = CanvasUtil.get_line_points(get_last_pressed_point(), get_current_point())
+	var draw_data = CanvasUtil.create_stroke_points(PropertyName.SHAPE.CIRCLE, line_width, image_rect, points, _drawn_points_color)
 	var line_color = ProjectData.get_config(PropertyName.LINE.COLOR)
 	for point in draw_data:
 		draw_data[point] = line_color

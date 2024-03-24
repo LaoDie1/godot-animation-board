@@ -11,10 +11,13 @@ extends Control
 
 @onready var menu: SimpleMenu = %SimpleMenu
 @onready var canvas_container: CanvasContainer = %CanvasContainer
-@onready var layer_buttons: LayerButtons = %LayerButtons
-@onready var tool_button_container: BoxContainer = %tool_button_container
+@onready var layer_buttons: LayerButtons = %ImageLayers
+@onready var toolbar: ToolBar = %Toolbar
 @onready var image_layer_timeline: ImageLayerTimeline = %ImageLayerTimeline
 @onready var current_frame_label: Label = %CurrentFrameLabel
+@onready var export_window: Window = %ExportWindow
+@onready var export_panel: ExportPanel = %ExportPanel
+@onready var new_project_window: Window = %NewProjectWindow
 
 
 #============================================================
@@ -34,7 +37,7 @@ func _init() -> void:
 			
 	)
 	# 新文件
-	ProjectData.new_file.connect(
+	ProjectData.newly_file.connect(
 		func():
 			# 创建图层
 			var frame_id = ProjectData.create_new_frame_id()
@@ -48,25 +51,15 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	#theme = preload("res://src/main/theme.tres")
+	ProjectData.set_config(PropertyName.KEY.IMAGE_RECT, Rect2i(0, 0, 64, 64))
+	# 新建文件
+	ProjectData.menu_new()
+	# 使用钢笔工具
+	ProjectData.active_tool(PropertyName.TOOL_NAME.PEN)
 	
 	_init_menu()
 	
-	ProjectData.set_config(PropertyName.IMAGE.RECT, Rect2i(0, 0, 500, 500))
-	
-	# 工具栏
-	var tool_button_group : ButtonGroup = ButtonGroup.new()
-	for tool_button:BaseButton in tool_button_container.get_children():
-		tool_button.button_group = tool_button_group
-	tool_button_group.pressed.connect(
-		func(tool_button: BaseButton):
-			var tool_name = tool_button.name
-			ProjectData.set_config(PropertyName.TOOL.CURRENT, tool_name)
-	)
-	tool_button_container.get_child(0).button_pressed = true
-	
-	# 新建文件
-	ProjectData.menu_new()
+	theme = preload("res://src/main/theme.tres")
 
 
 
@@ -77,12 +70,12 @@ func _init_menu():
 	menu.init_menu({
 		"File": [
 			"Open", "New", "Save", "Save As", "-",
-			{"Export": [ "PNG", "JPG"]},
+			"Export"
 		],
 		"Edit": ["Undo", "Redo"],
 		"Layer": [
 			"Add Layer", "-", 
-			"Add Frame", "Insert Frame",
+			"Add Frame", "Insert Frame", "Previous Frame", "Next Frame", "-"
 		],
 	})
 	
@@ -91,12 +84,15 @@ func _init_menu():
 		"/File/New": {"keycode": KEY_N, "ctrl": true},
 		"/File/Save": {"keycode": KEY_S, "ctrl": true},
 		"/File/Save As": {"keycode": KEY_S, "ctrl": true, "shift": true},
+		"/File/Export": {"keycode": KEY_E, "ctrl": true},
 		
 		"/Edit/Undo": {"keycode": KEY_Z, "ctrl": true},
 		"/Edit/Redo": {"keycode": KEY_Z, "ctrl": true, "shift": true},
 		
 		"/Layer/Add Frame": {"keycode": KEY_INSERT},
 		"/Layer/Insert Frame": {"keycode": KEY_INSERT, "shift": true},
+		"/Layer/Previous Frame": {"keycode": KEY_LEFT, "ctrl": true},
+		"/Layer/Next Frame": {"keycode": KEY_RIGHT, "ctrl": true},
 		
 	})
 	
@@ -111,15 +107,23 @@ func _init_menu():
 #============================================================
 func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 	match menu_path:
+		"/File/New": 
+			new_project_window.popup_centered()
+			
 		#"/File/Save":
 			#pass
-		"/File/New": ProjectData.menu_new()
+			
+		"/File/Export": 
+			export_window.popup_centered()
+			export_panel.update_content()
+			
 		"/Edit/Undo": ProjectData.menu_undo()
 		"/Edit/Redo": ProjectData.menu_redo()
 		"/Layer/Add Layer": ProjectData.menu_add_layer()
 		"/Layer/Add Frame": ProjectData.menu_add_frame()
 		"/Layer/Insert Frame": ProjectData.menu_insert_frame()
-			
+		"/Layer/Previous Frame": ProjectData.offset_current_frame(-1)
+		"/Layer/Next Frame": ProjectData.offset_current_frame(1)
 		_:
 			printerr("没有实现功能：", menu_path)
 
@@ -131,4 +135,9 @@ func _on_image_layer_timeline_play_state_changed(state: Variant) -> void:
 			canvas_container.onionskin.visible = false
 		
 		ImageLayerTimeline.PAUSE:
-			canvas_container.onionskin.visible = ProjectData.get_config(PropertyName.TOOL.ONIONSKIN, false)
+			canvas_container.onionskin.visible = ProjectData.get_config(PropertyName.KEY.ONIONSKIN, false)
+
+
+func _on_new_project_panel_created() -> void:
+	ProjectData.menu_new()
+	new_project_window.hide()

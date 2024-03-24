@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://k8o4b052xvcy"]
+
+[ext_resource type="Script" path="res://src/main/panels/setting_panel/pen_setting.gd" id="1_igheu"]
+
+[node name="PenSetting" type="MarginContainer"]
+offset_right = 216.0
+offset_bottom = 102.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_igheu")
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Pen Color"
+
+[node name="PenColor" type="ColorPickerButton" parent="GridContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+focus_mode = 0
+
+[node name="Label2" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Line Width"
+
+[node name="PenLineWidth" type="SpinBox" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 500.0
+value = 2.0
+
+[node name="Label3" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Shape"
+
+[node name="PenShape" type="OptionButton" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[connection signal="color_changed" from="GridContainer/PenColor" to="." method="_on_pen_color_color_changed"]
+[connection signal="value_changed" from="GridContainer/PenLineWidth" to="." method="_on_pen_line_width_value_changed"]
+[connection signal="item_selected" from="GridContainer/PenShape" to="." method="_on_pen_shape_item_selected"]

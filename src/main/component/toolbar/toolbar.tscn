@@ -1,0 +1,67 @@
+[gd_scene load_steps=11 format=3 uid="uid://3r4cfyureajl"]
+
+[ext_resource type="PackedScene" uid="uid://cg0c3vo5v32g3" path="res://src/main/component/custom_button/custom_button.tscn" id="1_jk8d7"]
+[ext_resource type="Script" path="res://src/main/component/toolbar/toolbar.gd" id="1_x0mi6"]
+[ext_resource type="PackedScene" uid="uid://cph5kpuucqs65" path="res://src/main/component/advanced_button/advanced_button.tscn" id="3_0d2ul"]
+[ext_resource type="Texture2D" uid="uid://bhdua1mg6g2c7" path="res://icon.svg" id="4_me3s4"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_s26vr"]
+device = -1
+keycode = 80
+unicode = 112
+
+[sub_resource type="Shortcut" id="Shortcut_o7n6u"]
+events = [SubResource("InputEventKey_s26vr")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_svnjd"]
+device = -1
+keycode = 69
+unicode = 101
+
+[sub_resource type="Shortcut" id="Shortcut_08v0l"]
+events = [SubResource("InputEventKey_svnjd")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_0bfty"]
+device = -1
+keycode = 86
+unicode = 118
+
+[sub_resource type="Shortcut" id="Shortcut_3im42"]
+events = [SubResource("InputEventKey_0bfty")]
+
+[node name="toolbar" type="BoxContainer"]
+size_flags_horizontal = 3
+vertical = true
+script = ExtResource("1_x0mi6")
+
+[node name="pen" parent="." instance=ExtResource("1_jk8d7")]
+layout_mode = 2
+shortcut = SubResource("Shortcut_o7n6u")
+
+[node name="eraser" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+shortcut = SubResource("Shortcut_08v0l")
+text = "Eraser"
+
+[node name="move" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+shortcut = SubResource("Shortcut_3im42")
+text = "Move"
+
+[node name="line" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Line"
+
+[node name="AdvancedButton" parent="." instance=ExtResource("3_0d2ul")]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = ExtResource("4_me3s4")

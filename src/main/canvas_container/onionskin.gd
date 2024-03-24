@@ -6,6 +6,8 @@
 # - version: 4.2.1
 #============================================================
 ## 洋葱皮
+##
+##显示前后的绘制形状
 class_name Onionskin
 extends Control
 
@@ -20,7 +22,7 @@ extends Control
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.new_file.connect(
+	ProjectData.newly_file.connect(
 		func():
 			queue_redraw()
 	)
@@ -28,14 +30,14 @@ func _init() -> void:
 		func(last_frame_id, frame_id):
 			queue_redraw()
 	)
-	ProjectData.listen_config(PropertyName.TOOL.ONIONSKIN, func(last, current):
+	ProjectData.listen_config(PropertyName.KEY.ONIONSKIN, func(last, current):
 		self.visible = current
 	)
 
 
 func _ready() -> void:
 	self.frame_range = frame_range
-	self.visible = ProjectData.get_config(PropertyName.TOOL.ONIONSKIN, false)
+	self.visible = ProjectData.get_config(PropertyName.KEY.ONIONSKIN, false)
 
 
 func _draw() -> void:
@@ -48,7 +50,7 @@ func _draw() -> void:
 	for idx in range(-frame_range, frame_range + 1):
 		frame_point = current_frame_point + idx
 		if idx != 0 and frame_point >= 0 and frame_point < ProjectData.get_frame_count():
-			alpha = (frame_range - abs(idx)) / float(frame_range) * 0.6
+			alpha = (frame_range - abs(idx)) / float(frame_range) * 0.5
 			frame_id = ProjectData.get_frame_id(frame_point)
 			for layer_id in ProjectData.get_layer_ids():
 				var texture = ProjectData.get_image_texture(layer_id, frame_id)
