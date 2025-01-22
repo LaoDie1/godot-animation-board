@@ -33,7 +33,7 @@ func _init() -> void:
 	# 默认配置
 	set_config(PropertyName.KEY.IMAGE_RECT, Rect2i(0, 0, 256, 256))
 	
-	set_config(PropertyName.PEN.LINE_WIDTH, 1)
+	set_config(PropertyName.PEN.SIZE, 1)
 	set_config(PropertyName.PEN.SHAPE, PropertyName.SHAPE.CIRCLE)
 	set_config(PropertyName.PEN.COLOR, Color.WHITE)
 	
@@ -91,7 +91,7 @@ func get_current_tool_name():
 ## 获取画布缩放
 func get_canvas_scale() -> Vector2:
 	var canvas_zoom = get_config(PropertyName.KEY.CANVAS_ZOOM, 0)
-	var v = pow(1.15, canvas_zoom)
+	var v = pow(1.25, canvas_zoom)
 	return Vector2(v, v)
 
 
@@ -133,11 +133,12 @@ static func init_property_name():
 		for property:String in property_list:
 			object[property] = StringName("/" + c_name.to_lower() + "/" + property.to_lower())
 
-var _size_to_stroke_points : Dictionary = {}
+var _size_to_circle_stroke_points : Dictionary = {}
+var _size_to_rectangle_stroke_points : Dictionary = {}
 
 ## 获取笔触点
-func get_stroke_points(size) -> Array:
-	if not _size_to_stroke_points.has(size):
+func get_circle_stroke_points(size: int) -> Array:
+	if not _size_to_circle_stroke_points.has(size):
 		var points : Array = []
 		var point : Vector2i = Vector2i()
 		var width = size / 2.0
@@ -147,8 +148,18 @@ func get_stroke_points(size) -> Array:
 				point.y = y
 				if point.length() <= width:
 					points.append(point)
-		_size_to_stroke_points[size] = points
-	return _size_to_stroke_points[size]
+		_size_to_circle_stroke_points[size] = points
+	return _size_to_circle_stroke_points[size]
+
+## 获取方形笔触点
+func get_rectangle_stroke_points(size: int) -> Array:
+	if not _size_to_rectangle_stroke_points.has(size):
+		pass
+		
+		
+		
+	return _size_to_rectangle_stroke_points[size]
+
 
 
 #============================================================
@@ -611,4 +622,3 @@ func offset_current_frame(offset: int):
 	elif frame_point >= get_frame_count():
 		frame_point = get_frame_count() - 1
 	update_current_frame_by_point(frame_point)
-

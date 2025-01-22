@@ -1,15 +1,16 @@
-[gd_scene load_steps=13 format=3 uid="uid://c2ch44wucrt8m"]
+[gd_scene load_steps=14 format=3 uid="uid://c2ch44wucrt8m"]
 
-[ext_resource type="Script" path="res://src/main/simple_menu.gd" id="1_3rbfd"]
-[ext_resource type="Script" path="res://src/main/main.gd" id="1_46xse"]
+[ext_resource type="Script" uid="uid://d3b5u34yjlgn" path="res://src/main/main.gd" id="1_46xse"]
+[ext_resource type="Script" uid="uid://c18u2rphedqe7" path="res://addons/apprentice/node/control/simple_menu.gd" id="2_w0wra"]
 [ext_resource type="PackedScene" uid="uid://d4in7v80fs4g5" path="res://src/main/canvas_container/canvas_container.tscn" id="3_3liki"]
 [ext_resource type="PackedScene" uid="uid://3r4cfyureajl" path="res://src/main/component/toolbar/toolbar.tscn" id="3_mk23h"]
-[ext_resource type="Script" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
+[ext_resource type="Script" uid="uid://kx2nj4h2uv4k" path="res://src/main/layer_buttons.gd" id="5_lepq6"]
 [ext_resource type="PackedScene" uid="uid://k8o4b052xvcy" path="res://src/main/panels/setting_panel/pen_setting.tscn" id="6_ge575"]
 [ext_resource type="PackedScene" uid="uid://cyy6u8mpf4ld5" path="res://src/main/panels/setting_panel/eraser_setting.tscn" id="7_7y26s"]
 [ext_resource type="PackedScene" uid="uid://2tpo4wrw11te" path="res://src/main/panels/export_panel/export_panel.tscn" id="7_e50gr"]
 [ext_resource type="PackedScene" uid="uid://ccvi3ga25277e" path="res://src/main/image_layer_timeline/image_layer_timeline.tscn" id="7_i4wsq"]
 [ext_resource type="PackedScene" uid="uid://dvsqj01rqrg5o" path="res://src/main/panels/setting_panel/canvas_setting.tscn" id="8_2pss8"]
+[ext_resource type="PackedScene" uid="uid://dqaq0b8snof1q" path="res://src/main/panels/setting_panel/line_setting.tscn" id="9_pstfw"]
 [ext_resource type="PackedScene" uid="uid://codgtaqt0klvt" path="res://src/main/panels/new_project_panel/new_project_panel.tscn" id="11_alrgo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1t64f"]
@@ -53,7 +54,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 flat = true
-script = ExtResource("1_3rbfd")
+script = ExtResource("2_w0wra")
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -149,24 +150,34 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+current_tab = 0
 tab_focus_mode = 0
 
 [node name="ImageLayers" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_lepq6")
+metadata/_tab_index = 0
 
 [node name="Pen" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("6_ge575")]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="Eraser" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("7_7y26s")]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="Canvas" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("8_2pss8")]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="Line" parent="MarginContainer/VBoxContainer/VSplitContainer/EditContainer/HSplitContainer/HSplitContainer/RightSection/PanelContainer/Pen/SettingTabContainer" instance=ExtResource("9_pstfw")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
 
 [node name="ImageLayerTimeline" parent="MarginContainer/VBoxContainer/VSplitContainer" instance=ExtResource("7_i4wsq")]
 unique_name_in_owner = true
@@ -182,6 +193,11 @@ layout_mode = 2
 [node name="CurrentFrameLabel" type="Label" parent="MarginContainer/VBoxContainer/PanelContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="SimpleMenu2" type="MenuBar" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_w0wra")
+metadata/_custom_type_script = ExtResource("2_w0wra")
 
 [node name="ExportWindow" type="Window" parent="."]
 unique_name_in_owner = true

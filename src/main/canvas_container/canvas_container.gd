@@ -20,9 +20,10 @@ extends Control
 @onready var canvas_border: ReferenceRect = %CanvasBorder
 @onready var canvas_zoom_label: Label = %CanvasZoomLabel
 @onready var background_panel: ColorRect = %BackgroundPanel
-@onready var canavs_margin_container: MarginContainer = %CanavsMarginContainer
+@onready var canvas_margin_container: MarginContainer = %CanvasMarginContainer
 
 
+var _last_size : Vector2 = Vector2()
 var _image_rect : Rect2i = Rect2i()
 var _layer_id_to_layer_node : Dictionary = {} # ID 对应的层级节点
 var _current_tool : ToolBase # 当前使用的工具
@@ -47,8 +48,8 @@ func _init() -> void:
 		_image_rect = Rect2i(Vector2i(), image_size)
 		input_board.custom_minimum_size = image_size
 		input_board.size = image_size
-		canavs_margin_container.custom_minimum_size = image_size
-		canavs_margin_container.size = image_size
+		canvas_margin_container.custom_minimum_size = image_size
+		canvas_margin_container.size = image_size
 		
 		# 更新节点
 		for tool:ToolBase in tools.get_children():
@@ -77,7 +78,7 @@ func _init() -> void:
 	ProjectData.listen_config(PropertyName.KEY.CANVAS_ZOOM, func(last, canvas_zoom):
 		var last_pos = canvas.get_local_mouse_position()
 		canvas.scale = ProjectData.get_canvas_scale()
-		canvas_border.border_width = pow(1.15, -canvas_zoom ) * 4
+		canvas_border.border_width = pow(1.25, -canvas_zoom ) * 4
 		canvas_zoom_label.text = str(canvas_zoom)
 		
 		# 位置偏移。正确偏移到鼠标位置的点
@@ -96,6 +97,16 @@ func _ready() -> void:
 	tools.set_input_board(input_board)
 	# 画布缩放
 	ProjectData.set_config(PropertyName.KEY.CANVAS_ZOOM, 0)
+	
+	await Engine.get_main_loop().process_frame
+	# 画布重定位
+	_last_size = self.size
+	resized.connect(
+		func():
+			var v = (self.size / _last_size)
+			canvas.position *= v # 按大小比值移动位置
+			_last_size = self.size
+	)
 
 
 func _gui_input(event: InputEvent) -> void:

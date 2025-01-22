@@ -54,5 +54,3 @@ func _released(button_index):
 	for point in draw_data:
 		draw_data[point] = line_color
 	released.emit(draw_data)
-
-

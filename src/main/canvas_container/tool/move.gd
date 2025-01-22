@@ -27,4 +27,3 @@ func _press_moving(last_point: Vector2, current_point: Vector2):
 
 func _released(button_index):
 	move_finished.emit()
-

@@ -32,4 +32,3 @@ func _ready() -> void:
 			ProjectData.active_tool(tool_name)
 	, Object.CONNECT_DEFERRED)
 	get_child(0).button_pressed = true
-

@@ -83,4 +83,3 @@ func get_last_release_point() -> Vector2:
 
 func get_last_release_pointi() -> Vector2i:
 	return Vector2i(_release_point)
-

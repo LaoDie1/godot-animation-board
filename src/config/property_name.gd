@@ -45,7 +45,7 @@ class TOOL_NAME:
 # 钢笔工具
 class PEN:
 	static var COLOR
-	static var LINE_WIDTH
+	static var SIZE
 	static var SHAPE
 
 # 橡皮擦

@@ -111,4 +111,3 @@ func _on_export_pressed() -> void:
 
 func _on_export_file_dialog_file_selected(path: String) -> void:
 	export_file_path_line_edit.text = path
-

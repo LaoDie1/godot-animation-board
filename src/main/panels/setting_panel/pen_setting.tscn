@@ -27,7 +27,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="GridContainer"]
 layout_mode = 2
-text = "Pen Color"
+text = "Color"
 
 [node name="PenColor" type="ColorPickerButton" parent="GridContainer"]
 unique_name_in_owner = true
@@ -37,15 +37,15 @@ focus_mode = 0
 
 [node name="Label2" type="Label" parent="GridContainer"]
 layout_mode = 2
-text = "Line Width"
+text = "Size"
 
-[node name="PenLineWidth" type="SpinBox" parent="GridContainer"]
+[node name="PenSize" type="SpinBox" parent="GridContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
 max_value = 500.0
-value = 2.0
+value = 1.0
 
 [connection signal="item_selected" from="GridContainer/PenShape" to="." method="_on_pen_shape_item_selected"]
 [connection signal="color_changed" from="GridContainer/PenColor" to="." method="_on_pen_color_color_changed"]
-[connection signal="value_changed" from="GridContainer/PenLineWidth" to="." method="_on_pen_line_width_value_changed"]
+[connection signal="value_changed" from="GridContainer/PenSize" to="." method="_on_pen_size_value_changed"]

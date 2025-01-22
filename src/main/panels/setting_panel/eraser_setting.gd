@@ -41,4 +41,3 @@ func _on_eraser_size_value_changed(value: float) -> void:
 
 func _on_eraser_shape_item_selected(index: int) -> void:
 	ProjectData.set_config(PropertyName.ERASER.SHAPE, index)
-

@@ -24,12 +24,27 @@ var _last_shift_pos : Vector2 = Vector2()
 #  内置
 #============================================================
 func _init() -> void:
-	ProjectData.set_config(PropertyName.PEN.LINE_WIDTH, 1)
+	ProjectData.set_config(PropertyName.PEN.SIZE, 1)
 
 
 #============================================================
 #  自定义
 #============================================================
+func draw_colors(from: Vector2, to: Vector2):
+	# 绘制
+	var pen_shape_type = ProjectData.get_config(PropertyName.PEN.SHAPE)
+	var pen_line_width = ProjectData.get_config(PropertyName.PEN.SIZE)
+	var pen_color = ProjectData.get_config(PropertyName.PEN.COLOR)
+	var draw_data = CanvasUtil.draw_colors(
+		from, to, 
+		image_rect, pen_shape_type, pen_line_width, pen_color, 
+		_drawn_points_color
+	)
+	if not draw_data.is_empty():
+		drawn.emit(draw_data)
+		_drawn_points_color.merge(draw_data)
+
+
 func _pressed(button_index):
 	if get_last_button_index() != MOUSE_BUTTON_LEFT:
 		return
@@ -37,7 +52,7 @@ func _pressed(button_index):
 	_last_shift_pos = Vector2()
 	_drawn_points_color.clear()
 	ready_draw.emit()
-
+	draw_colors( get_last_pressed_point(), get_last_pressed_point() )
 
 
 func _press_moving(last_point: Vector2, current_point: Vector2) -> void:
@@ -71,16 +86,7 @@ func _press_moving(last_point: Vector2, current_point: Vector2) -> void:
 			_last_shift_pos = current_point
 	
 	# 绘制
-	var pen_shape_type = ProjectData.get_config(PropertyName.PEN.SHAPE)
-	var pen_line_width = ProjectData.get_config(PropertyName.PEN.LINE_WIDTH)
-	var pen_color = ProjectData.get_config(PropertyName.PEN.COLOR)
-	var line_points = CanvasUtil.get_line_points(Vector2i(last_point), Vector2(current_point))
-	var draw_data = CanvasUtil.create_stroke_points(pen_shape_type, pen_line_width, image_rect, line_points, _drawn_points_color)
-	for point in draw_data:
-		draw_data[point] = pen_color
-		_drawn_points_color[point] = null
-	if not draw_data.is_empty():
-		drawn.emit(draw_data)
+	draw_colors(last_point, current_point)
 
 
 func _released(button_index):

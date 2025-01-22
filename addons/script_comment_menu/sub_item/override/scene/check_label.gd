@@ -48,4 +48,3 @@ func _ready():
 
 func _pressed(button_index):
 	pressed.emit()
-

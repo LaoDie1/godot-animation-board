@@ -66,7 +66,7 @@ func _ready() -> void:
 	
 	_init_menu()
 	
-	theme = preload("res://src/main/theme.tres")
+	#theme = preload("res://src/main/theme.tres")
 
 
 

@@ -58,5 +58,3 @@ func _draw() -> void:
 					draw_texture(texture, Vector2(), Color(1,0,0,alpha))
 				else:
 					draw_texture(texture, Vector2(), Color(0,1,0,alpha))
-
-

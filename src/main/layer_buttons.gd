@@ -81,4 +81,3 @@ func get_layer_data(layer_id: float) -> Dictionary:
 func select_layer(layer_id: float):
 	get_layer_data(layer_id)["node"].button_pressed = true
 	ProjectData.add_select_layer(layer_id)
-

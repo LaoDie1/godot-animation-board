@@ -96,4 +96,3 @@ func _gui_input(event: InputEvent) -> void:
 					# 更新当前的帧位置
 					ProjectData.update_current_frame(frame_id)
 					clicked_frame.emit(frame_id)
-

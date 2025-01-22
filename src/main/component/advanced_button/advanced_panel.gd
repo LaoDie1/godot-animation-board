@@ -27,6 +27,3 @@ func _gui_input(event: InputEvent) -> void:
 				_last_press_point = get_global_mouse_position()
 				_pressed_node_point = global_position
 			
-
-
-

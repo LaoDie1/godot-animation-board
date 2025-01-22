@@ -55,4 +55,3 @@ func deactive():
 	input_board.press_moving.disconnect(_press_moving)
 	input_board.released.disconnect(_released)
 	input_board.rolling.disconnect(_rolling)
-

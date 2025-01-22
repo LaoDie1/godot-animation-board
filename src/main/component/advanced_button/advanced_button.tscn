@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cph5kpuucqs65"]
 
-[ext_resource type="Script" path="res://src/main/component/advanced_button/advanced_button.gd" id="1_3eeb8"]
+[ext_resource type="Script" uid="uid://bvbumlw66qlrv" path="res://src/main/component/advanced_button/advanced_button.gd" id="1_3eeb8"]
 [ext_resource type="Texture2D" uid="uid://bhdua1mg6g2c7" path="res://icon.svg" id="2_kv0iw"]
 
 [node name="AdvancedButton" type="Control"]

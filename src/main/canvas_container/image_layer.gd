@@ -101,5 +101,3 @@ func draw_color_by_data(data: Dictionary, offset: Vector2i = Vector2i.ZERO):
 func draw_color_by_texture(texture: Texture2D, offset: Vector2i = Vector2i.ZERO):
 	ProjectData.add_image_texture(_last_layer_id, _last_frame_id, texture, offset)
 	queue_redraw()
-
-

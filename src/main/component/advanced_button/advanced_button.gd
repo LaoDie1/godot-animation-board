@@ -109,4 +109,3 @@ func _gui_input(event: InputEvent) -> void:
 			if not event.pressed:
 				button_pressed = not button_pressed
 			queue_redraw()
-
