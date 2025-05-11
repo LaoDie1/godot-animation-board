@@ -12,6 +12,4 @@ Godot Animation Board
 
 效果
 
-![](C:\Users\z\Documents\Godot\Projects\godot-animation-board\IMAGE_01.png)
-
-
+![](IMAGE_01.png)
