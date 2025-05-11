@@ -21,6 +21,10 @@ config/icon="res://icon.svg"
 
 ProjectData="*res://src/config/project_data.gd"
 
+[display]
+
+window/subwindows/embed_subwindows=false
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/apprentice/plugin.cfg", "res://addons/script_comment_menu/plugin.cfg")

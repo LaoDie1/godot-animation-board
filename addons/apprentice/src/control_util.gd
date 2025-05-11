@@ -76,3 +76,17 @@ static func has_point_in_control(point: Vector2, control: Control) -> bool:
 
 static func has_mouse_point_in_control(control: Control) -> bool:
 	return has_point_in_control(control.get_local_mouse_position(), control)
+
+
+## 根据鼠标位置缩放
+static func mouse_zoom_scale(canvas: Control, zoom: Vector2) -> void:
+	# 缩放前鼠标位置
+	var last_pos : Vector2 = canvas.get_local_mouse_position()
+	# 缩放
+	canvas.scale = zoom
+	# 位置偏移。正确偏移到鼠标位置的点
+	var current_pos : Vector2 = canvas.get_local_mouse_position()
+	var offset : Vector2 = current_pos - last_pos
+	if offset > canvas.size:
+		offset = canvas.size
+	canvas.position += offset * canvas.scale

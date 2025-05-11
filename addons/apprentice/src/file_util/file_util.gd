@@ -292,10 +292,11 @@ static func write_as_json(file_path: String, data):
 static func read_as_json(
 	file_path: String, 
 	skip_cr: bool = false
-):
+) -> Variant:
 	var json = read_as_string(file_path, skip_cr)
 	if json != null:
 		return JSON.parse_string(json)
+	return null
 
 
 ## 写入字符串变量数据
@@ -345,9 +346,19 @@ static func get_object_file(object: Object) -> String:
 ## 获取实际路径
 static func get_real_path(path: String) -> String:
 	if OS.has_feature("editor"):
+		# 编辑器中运行
 		return ProjectSettings.globalize_path(path)
 	else:
-		return OS.get_executable_path().get_base_dir().path_join(path.get_file())
+		# 导出后运行
+		if path.begins_with("res://"):
+			var relative_path : String = path.substr("res://".length())
+			return OS.get_executable_path().get_base_dir().path_join(relative_path)
+		elif path.begins_with("user://"):
+			var relative_path : String = path.substr("user://".length())
+			return OS.get_user_data_dir().path_join(relative_path)
+		elif path.is_relative_path():
+			return OS.get_executable_path().get_base_dir().path_join(path)
+		return path
 
 
 ##  保存点为场景文件
@@ -375,19 +386,6 @@ static func make_dir_if_not_exists(dir_path: String) -> bool:
 		DirAccess.make_dir_recursive_absolute(dir_path)
 		return true
 	return false
-
-
-## Shell 打开文件
-static func shell_open(path: String) -> void:
-	if path.begins_with("res://") or path.begins_with("user://"):
-		path = get_real_path(path)
-	if file_exists(path):
-		if OS.get_name() == "Windows":
-			# 路径不替换为 \ 会执行失败
-			var command : String = 'explorer.exe /select,"%s"' % path.replace("/", "\\")
-			OS.execute_with_pipe("CMD.exe", ["/C", command])
-			return
-	OS.shell_open(path)
 
 
 ## 获取项目路径
@@ -620,5 +618,25 @@ static func _get_16(data: PackedByteArray, offset: int) -> int:
 	return data[offset] | (data[offset + 1] << 8) 
 
 
+## 获取当前项目的启动路径
 static func get_executable_path() -> String:
 	return OS.get_executable_path()
+
+
+## Shell 打开文件
+static func shell_open(path: String) -> void:
+	if path.begins_with("res://") or path.begins_with("user://"):
+		path = get_real_path(path)
+	if file_exists(path):
+		if OS.get_name() == "Windows":
+			# 路径不替换为 \ 会执行失败
+			var command : String = 'explorer.exe /select,"%s"' % path.replace("/", "\\")
+			OS.execute_with_pipe("CMD.exe", ["/C", command])
+			return
+	OS.shell_open(path)
+
+
+## 执行文件
+static func execute(file_path: String, paras: PackedStringArray = []):
+	var path: String = get_real_path(file_path)
+	OS.execute_with_pipe(path, paras)

@@ -41,6 +41,8 @@ signal removed_item(file_path: String, item: TreeItem)
 signal button_pressed(file_path: String, button_id: int)
 ## Item 重命名
 signal renamed_item(new_path: String, old_path: String, item: TreeItem)
+## 选中这个项
+signal selected_item(file_path: String)
 
 
 enum ShowType {
@@ -87,8 +89,10 @@ func _init() -> void:
 	button_clicked.connect(
 		func(item: TreeItem, column: int, button_type: int, mouse_button_index: int):
 			if mouse_button_index == MOUSE_BUTTON_LEFT:
-				var path : String = item.get_meta(MetaKey.PATH, "")
-				self.button_pressed.emit(path, button_type)
+				var mouse_item: TreeItem = get_item_at_position(get_local_mouse_position())
+				if mouse_item == item:
+					var path : String = item.get_meta(MetaKey.PATH, "")
+					self.button_pressed.emit(path, button_type)
 	)
 	set_column_custom_minimum_width(0, 150)
 	item_edited.connect(
@@ -98,6 +102,12 @@ func _init() -> void:
 			var new_file_name : String = item.get_text(0)
 			var new_file_path : String = file_path.get_base_dir().path_join(new_file_name)
 			renamed_item.emit(new_file_path, file_path, item)
+	)
+	item_selected.connect(
+		func():
+			var file_path : String = get_selected_file()
+			if file_path:
+				selected_item.emit(file_path)
 	)
 
 
@@ -219,8 +229,8 @@ func update_item(file_path:String, new_path: String):
 
 ## 获取选中的文件
 func get_selected_file() -> String:
-	var item = get_selected()
-	if item:
+	var item : TreeItem = get_selected()
+	if item and item.has_meta(MetaKey.PATH):
 		return item.get_meta(MetaKey.PATH)
 	return ""
 

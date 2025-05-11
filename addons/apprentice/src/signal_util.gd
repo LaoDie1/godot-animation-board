@@ -271,3 +271,8 @@ func apply(object: Object, list: Array):
 static func disconnect_all(_signal: Signal):
 	for data in _signal.get_connections():
 		_signal.disconnect(data['callable'])
+
+## 断开连接方法
+static func disconnect_if(_signal:Signal, callback: Callable):
+	if _signal.is_connected(callback):
+		_signal.disconnect(callback)

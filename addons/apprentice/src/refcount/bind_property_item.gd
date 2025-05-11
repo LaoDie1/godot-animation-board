@@ -128,6 +128,8 @@ func get_value(default = null):
 		return default
 	return _value
 
+func has_value() -> bool:
+	return typeof(_value) != TYPE_NIL
 
 ## 获取这个值，如果没有则设置为默认值
 func get_value_or_add(default = null):

@@ -10,7 +10,8 @@ class_name StreamRequest
 extends Node
 
 
-signal responsed(body_chunk: PackedByteArray)
+signal responded(body_chunk: PackedByteArray)
+signal responded_error(status: HTTPClient.Status)
 signal connected  ## 已连接
 signal connect_closed  ##连接关闭
 
@@ -39,7 +40,7 @@ func request(url: String, headers: PackedStringArray = PackedStringArray(), meth
 	# 等待连接完成
 	while http_client.get_status() == HTTPClient.STATUS_CONNECTING or http_client.get_status() == HTTPClient.STATUS_RESOLVING:
 		http_client.poll()
-		OS.delay_msec(100)
+		await Engine.get_main_loop().process_frame
 
 	if http_client.get_status() != HTTPClient.STATUS_CONNECTED:
 		push_error("Failed to connect to host. Status: ", http_client.get_status())
@@ -70,13 +71,26 @@ func _process(delta):
 			# 读取分块数据
 			var chunk = http_client.read_response_body_chunk()
 			if chunk.size() > 0:
-				responsed.emit(chunk)
+				responded.emit(chunk)
+		
 		HTTPClient.STATUS_DISCONNECTED, HTTPClient.STATUS_CONNECTED:
+			# 已断开
+			close()
+		
+		HTTPClient.STATUS_REQUESTING:
+			# 连接中
+			pass
+		
+		_:
+			# 出现错误
+			print_debug(http_client.get_status())
+			responded_error.emit(http_client.get_status())
 			close()
 
 
 func close():
 	# 连接关闭
-	is_connected = false
-	connect_closed.emit()
+	if is_connected:
+		is_connected = false
+		connect_closed.emit()
 	http_client.close()

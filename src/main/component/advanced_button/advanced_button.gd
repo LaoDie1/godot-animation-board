@@ -109,3 +109,13 @@ func _gui_input(event: InputEvent) -> void:
 			if not event.pressed:
 				button_pressed = not button_pressed
 			queue_redraw()
+
+
+func _get_drag_data(at_position):
+	var texture_rect = TextureRect.new()
+	texture_rect.texture = self.texture
+	texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	texture_rect.size = self.size
+	set_drag_preview(texture_rect)
+	return self

@@ -387,6 +387,9 @@ static func create_texture_by_color(size: Vector2, fill_color: Color) -> ImageTe
 	image.fill(fill_color)
 	return ImageTexture.create_from_image(image)
 
+static func create_image(size: Vector2i) -> Image:
+	return Image.create(size.x, size.y, true, Image.FORMAT_RGBA8)
+
 
 class _PreviewReceiver:
 	
@@ -483,13 +486,6 @@ static func outline(
 	return ImageTexture.create_from_image(new_image)
 
 
-static func get_max_vectori(a: Vector2i, b: Vector2i) -> Vector2i:
-	return Vector2i( maxi(a.x, b.x), maxi(a.y, b.y) )
-
-static func get_min_vectori(a: Vector2i, b: Vector2i) -> Vector2i:
-	return Vector2i( mini(a.x, b.x), mini(a.y, b.y) )
-
-
 static func get_line_points(begin: Vector2i, end: Vector2i) -> Array:
 	var points = {}
 	var direction : Vector2 = Vector2(begin).direction_to(Vector2(end))
@@ -513,10 +509,6 @@ static func create_stroke_points(shape_type, width: int, image_rect: Rect2i, poi
 				draw_data[tmp_p] = null
 	return draw_data
 
-static func create_image(size: Vector2i) -> Image:
-	return Image.create(size.x, size.y, true, Image.FORMAT_RGBA8)
-
-
 ## 绘制颜色
 static func draw_colors(
 	from: Vector2i, to: Vector2i, 
@@ -526,10 +518,10 @@ static func draw_colors(
 	# 绘制
 	var line_points : Array
 	if from != to:
-		line_points = CanvasUtil.get_line_points(Vector2i(from), Vector2(to))
+		line_points = get_line_points(Vector2i(from), Vector2(to))
 	else:
 		line_points = [from]
-	var draw_data = CanvasUtil.create_stroke_points(shape_type, width, image_rect, line_points, exclude_points)
+	var draw_data = create_stroke_points(shape_type, width, image_rect, line_points, exclude_points)
 	for point in draw_data:
 		draw_data[point] = color
 	draw_data[from] = color

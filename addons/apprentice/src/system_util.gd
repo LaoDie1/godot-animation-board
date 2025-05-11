@@ -8,10 +8,13 @@
 ## 系统工具
 class_name SystemUtil
 
+
 enum ThemeType {
-	DARK,
-	LIGHT,
+	System, ##跟随系统
+	DARK, ##暗色
+	LIGHT, ##亮色
 }
+
 
 ## 获取主题类型
 static func get_theme_type() -> ThemeType:
@@ -35,12 +38,15 @@ static func find_program(program_name: String) -> PackedStringArray:
 
 ## 名称区分大小写
 static func find_running_program(program_name_or_id) -> Array[Dictionary]:
+	# TODO 后续增加为 Get-CimInstance 命令
 	var result: String
 	const CMD_CODE = 'wmic process where "%s" get name,processid,executablepath /format:csv'
+	var command : String
 	if program_name_or_id is String:
-		result = execute_command([CMD_CODE % ('name like "%' + program_name_or_id + '%"')])
+		command = CMD_CODE % ('name like "%' + str(program_name_or_id) + '%"')
 	elif program_name_or_id is int:
-		result = execute_command([CMD_CODE % 'processid="' + program_name_or_id + '"'])
+		command = CMD_CODE % ('processid=' + str(program_name_or_id))
+	result = execute_command([command])
 	result = str(result).strip_edges().replace("\\", "/")
 	# 转换为字典格式数据
 	var lines = result.split("\r\n")
@@ -81,10 +87,13 @@ enum {
 
 static var _confirmation_dialog_list : Array[ConfirmationDialog] = []
 ## 弹出确认框。传入的方法中需要有一个参数接收点击的结果，如果是 0 则为点击确认，其他结果则为取消
-static func popup_confirmation_dialog(message: String, result_callback: Callable=Callable(), title:="请确认...", rect:=Rect2()) -> ConfirmationDialog:
+static func popup_confirmation_dialog(message: String, result_callback: Callable=Callable(), title:="", show_not_button:bool=true, rect:=Rect2()) -> ConfirmationDialog:
+	if title.is_empty():
+		title = "请确认..."
 	if _confirmation_dialog_list.is_empty():
 		var dialog := ConfirmationDialog.new()
 		var not_button : Button = dialog.add_cancel_button("NOT")
+		not_button.visible = show_not_button
 		dialog.set_meta("btn_not", not_button)
 		dialog.visibility_changed.connect(
 			func():

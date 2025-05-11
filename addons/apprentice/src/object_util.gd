@@ -170,7 +170,6 @@ static func disconnect_if(_signal:Signal, callback: Callable):
 	if _signal.is_connected(callback):
 		_signal.disconnect(callback)
 
-
 static func is_valids(objects: Array) -> bool:
 	for object in objects:
 		if not is_instance_valid(object):

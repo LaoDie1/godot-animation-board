@@ -197,13 +197,12 @@ layout_mode = 2
 [node name="SimpleMenu2" type="MenuBar" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 script = ExtResource("2_w0wra")
-metadata/_custom_type_script = ExtResource("2_w0wra")
+metadata/_custom_type_script = "uid://c18u2rphedqe7"
 
 [node name="ExportWindow" type="Window" parent="."]
 unique_name_in_owner = true
 use_taa = true
 canvas_item_default_texture_filter = 0
-mode = 4
 title = "Export"
 position = Vector2i(50, 80)
 size = Vector2i(800, 500)

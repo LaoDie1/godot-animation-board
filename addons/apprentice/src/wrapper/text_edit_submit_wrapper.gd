@@ -15,11 +15,13 @@ signal text_submitted(new_text: String)
 var text_edit: TextEdit
 
 
+func _init(text_edit: TextEdit = null):
+	self.text_edit = text_edit
+	self.text_edit.gui_input.connect(self._gui_input)
+
+
 static func create(text_edit: TextEdit) -> TextEditSubmitWrapper:
-	var wrapper := TextEditSubmitWrapper.new()
-	wrapper.text_edit = text_edit
-	text_edit.gui_input.connect(wrapper._gui_input)
-	return wrapper
+	return TextEditSubmitWrapper.new(text_edit)
 
 
 func _gui_input(event) -> void:

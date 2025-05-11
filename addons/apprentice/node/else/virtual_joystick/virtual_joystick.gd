@@ -12,35 +12,33 @@
 class_name VirtualJoystick
 extends Control
 
-
 ##  摇杆线程。[code]direction[/code] 方向，[code]strength[/code] 力度
 signal analogic_process(direction: Vector2, strength: float)
-signal analogic_change(direction: Vector2, strength: float)
+signal analogic_chage(direction: Vector2, strength: float)
 signal analogic_released
 
 
 @export var border: Texture2D:
 	set(value):
 		border = value
-		queue_redraw()
+		_draw()
 @export var stick: Texture2D:
 	set(value):
 		stick = value
-		queue_redraw()
-@export var stick_scale: float = 0.65:
-	set(v):
-		stick_scale = v
-		queue_redraw()
-@export_flags("Mobile:1", "Computy:2", "Web:4") var display_platform : int = 7:
+		_draw()
+@export_flags("Mobile", "Computy", "Web") 
+var display_platform : int = 1:
 	set(v):
 		display_platform = v
+		
 		match OS.get_name():
 			"Android", "iOS":
 				visible = (display_platform & 1 == 1)
 			"Windows", "UWP", "macOS", "Linux", "FreeBSD", "NetBSD", "OpenBSD", "BSD":
 				visible = (display_platform & 2 == 2)
 			"Web":
-				visible = (display_platform & 4 == 4)
+				visible = (display_platform & 3 == 3)
+		
 
 
 # 摇杆圈
@@ -54,14 +52,16 @@ var _touch_pos : Vector2:
 		_touch_max_radius = _touch_pos.length()
 var _touch_max_radius : float
 var _on_going_drag := false
-var _direction : Vector2 = Vector2(0, 0) # 上次的方向
-var _strength : float = 0.0 # 力度，离中心点和最大距离之间的比值
+# 上次的方向
+var _direction : Vector2 = Vector2(0, 0)
+# 力度，离中心点和最大距离之间的比值
+var _strength : float = 0.0
 
 
 #============================================================
 #  SetGet
 #============================================================
-func get_last_direction() -> Vector2:
+func get_last_normalize() -> Vector2:
 	return _direction
 
 func get_last_strength() -> float:
@@ -75,6 +75,7 @@ func _enter_tree():
 	if Engine.is_editor_hint():
 		set_process(false)
 		set_physics_process(false)
+	
 	self.display_platform = display_platform
 
 
@@ -87,20 +88,8 @@ func _ready() -> void:
 			_direction = Vector2(0, 0)
 			self.analogic_released.emit()
 		)
-	self.display_platform = display_platform
-	
-	add_child(touch_circle)
-	add_child(joystick)
-	move_child(joystick, 0)
-	joystick.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	joystick.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	joystick.size = self.size
-	
 	queue_redraw()
-
-
-func _physics_process(delta):
-	self.analogic_process.emit(_direction, _strength)
+	self.display_platform = display_platform
 
 
 func _draw():
@@ -110,9 +99,12 @@ func _draw():
 	touch_circle.texture_normal = stick \
 		if is_instance_valid(stick) \
 		else preload("sprites/stick.png")
-	touch_circle.modulate.a = 0.8
-	touch_circle.scale = self.size / Vector2(touch_circle.texture_normal.get_size()) * stick_scale
+	_init_node()
 	_reset_position()
+
+
+func _physics_process(delta):
+	self.analogic_process.emit(_direction, _strength)
 
 
 func _gui_input(event):
@@ -125,7 +117,7 @@ func _gui_input(event):
 				_strength = 0.0
 				_reset_position()
 			else:
-				self.analogic_change.emit(_direction, _strength)
+				self.analogic_chage.emit(_direction, _strength)
 	
 	if event is InputEventScreenDrag:
 		var diff : Vector2 = Vector2(event.position - size/2).limit_length(_touch_max_radius)
@@ -133,11 +125,31 @@ func _gui_input(event):
 		_strength = length / _touch_max_radius
 		_direction = diff.normalized()
 		touch_circle.position = _touch_pos + diff
-		self.analogic_change.emit(_direction, _strength)
+		self.analogic_chage.emit(_direction, _strength)
+
+
+#============================================================
+#  自定义
+#============================================================
+func _init_node():
+	if not joystick.is_inside_tree():
+		add_child(joystick)
+		move_child(joystick, 0)
+		joystick.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		joystick.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		joystick.size = self.size
+		joystick.set_anchors_preset(Control.PRESET_FULL_RECT)
+		
+	if not touch_circle.is_inside_tree():
+		touch_circle.modulate.a = 0.8
+		joystick.add_child(touch_circle)
 
 
 func _reset_position():
 	if touch_circle.texture_normal:
-		joystick.position = (self.size - joystick.size) / 2
-		_touch_pos = (self.size - touch_circle.texture_normal.get_size() * touch_circle.scale) / 2
+		_touch_pos = (self.size - touch_circle.scale * Vector2(touch_circle.texture_normal.get_image().get_size())) / 2
+		if not is_inside_tree():
+			await ready
 		create_tween().tween_property(touch_circle, "position", _touch_pos, 0.08)
+	
+

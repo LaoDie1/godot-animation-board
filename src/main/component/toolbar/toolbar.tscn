@@ -1,9 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://3r4cfyureajl"]
+[gd_scene load_steps=10 format=3 uid="uid://3r4cfyureajl"]
 
 [ext_resource type="PackedScene" uid="uid://cg0c3vo5v32g3" path="res://src/main/component/custom_button/custom_button.tscn" id="1_jk8d7"]
-[ext_resource type="Script" path="res://src/main/component/toolbar/toolbar.gd" id="1_x0mi6"]
+[ext_resource type="Script" uid="uid://ce2c8xax418vq" path="res://src/main/component/toolbar/toolbar.gd" id="1_x0mi6"]
 [ext_resource type="PackedScene" uid="uid://cph5kpuucqs65" path="res://src/main/component/advanced_button/advanced_button.tscn" id="3_0d2ul"]
-[ext_resource type="Texture2D" uid="uid://bhdua1mg6g2c7" path="res://icon.svg" id="4_me3s4"]
 
 [sub_resource type="InputEventKey" id="InputEventKey_s26vr"]
 device = -1
@@ -37,6 +36,7 @@ script = ExtResource("1_x0mi6")
 [node name="pen" parent="." instance=ExtResource("1_jk8d7")]
 layout_mode = 2
 shortcut = SubResource("Shortcut_o7n6u")
+text = "Pen"
 
 [node name="eraser" type="Button" parent="."]
 layout_mode = 2
@@ -62,6 +62,6 @@ toggle_mode = true
 text = "Line"
 
 [node name="AdvancedButton" parent="." instance=ExtResource("3_0d2ul")]
+visible = false
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-texture = ExtResource("4_me3s4")

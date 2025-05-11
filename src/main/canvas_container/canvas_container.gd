@@ -104,7 +104,6 @@ func _ready() -> void:
 	resized.connect(
 		func():
 			var v = (self.size / _last_size)
-			canvas.position *= v # 按大小比值移动位置
 			_last_size = self.size
 	)
 

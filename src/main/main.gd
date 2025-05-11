@@ -87,17 +87,17 @@ func _init_menu():
 	})
 	
 	menu.init_shortcut({
-		"/File/Open": {"keycode": KEY_O, "ctrl": true},
-		"/File/New": {"keycode": KEY_N, "ctrl": true},
-		"/File/Save": {"keycode": KEY_S, "ctrl": true},
-		"/File/Save As": {"keycode": KEY_S, "ctrl": true, "shift": true},
-		"/File/Export": {"keycode": KEY_E, "ctrl": true},
+		"/File/Open": "Ctrl+O",
+		"/File/New": "Ctrl+N",
+		"/File/Save": "Ctrl+S",
+		"/File/Save As": "Ctrl+Shift+S",
+		"/File/Export": "Ctrl+E",
 		
-		"/Edit/Undo": {"keycode": KEY_Z, "ctrl": true},
-		"/Edit/Redo": {"keycode": KEY_Z, "ctrl": true, "shift": true},
+		"/Edit/Undo": "Ctrl+Z",
+		"/Edit/Redo": "Ctrl+Shift+Z",
 		
-		"/Layer/Add Frame": {"keycode": KEY_INSERT},
-		"/Layer/Insert Frame": {"keycode": KEY_INSERT, "shift": true},
+		"/Layer/Add Frame": "Insert",
+		"/Layer/Insert Frame": "Shift+Insert",
 		"/Layer/Previous Frame": {"keycode": KEY_LEFT, "ctrl": true},
 		"/Layer/Next Frame": {"keycode": KEY_RIGHT, "ctrl": true},
 		
@@ -114,8 +114,7 @@ func _init_menu():
 #============================================================
 func _on_simple_menu_menu_pressed(idx: int, menu_path: StringName) -> void:
 	match menu_path:
-		"/File/New": 
-			new_project_window.popup_centered()
+		"/File/New": new_project_window.popup_centered()
 			
 		#"/File/Save":
 			#pass

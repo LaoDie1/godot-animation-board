@@ -5,9 +5,43 @@
 # - datetime: 2022-11-27 01:01:10
 # - version: 4.2.1
 #============================================================
-## 简单菜单
+## 简单菜单。提供一个简单快速的方式创建菜单节点和功能
 ##
-##通过调用 [method init_menu] 方法初始化菜单项，[method init_shortcut] 初始化快捷键。
+##通过调用 [method init_menu] 方法初始化菜单项，[method init_shortcut] 初始化快捷键。[br]
+## 
+##[Dictionary] 类型数据创建菜单子节点，[Array] 添加菜单项
+##[codeblock]
+##$SimpleMenu.init_menu({
+##    "File": ["Open", "Save"], 
+##    "Edit": ["Redo", "Undo"],
+##})
+##[/codeblock]
+##添加快捷键
+##[codeblock]
+##$SimpleMenu.init_shortcut({
+##    "/File/Open": "ctrl+o",
+##    "/File/Save": "ctrl+s",
+##    "/Edit/Undo": "ctrl+z",
+##    "/Edit/Rndo": "ctrl+shift+z",
+##})
+##[/codeblock]
+##连接菜单信号执行菜单功能
+##[codeblock]
+##$SimpleMenu.menu_pressed.connect(
+##    func(idx, menu_path):
+##        match menu_path:
+##            "/File/Open":
+##                pass
+##            "/File/Save":
+##                pass
+##            "/Edit/Redo":
+##                pass
+##            "/Edit/Undo":
+##                pass
+##            _:
+##                pass
+##)
+##[/codeblock]
 @tool
 class_name SimpleMenu
 extends MenuBar
@@ -55,7 +89,9 @@ func get_menu(menu_path: StringName) -> PopupMenu:
 ##    "keycode": KEY_C,
 ##}
 ##[/codeblock]
-func set_menu_shortcut(menu_path: StringName, data: Dictionary):
+func set_menu_shortcut(menu_path: StringName, data):
+	if data is String:
+		data = parse_shortcut(data)
 	var shortcut = Shortcut.new()
 	var input = InputEventKey.new()
 	shortcut.events.append(input)
@@ -80,12 +116,14 @@ func _execute_menu_by_path(menu_path: StringName, method_name: String, params: A
 		return menu.callv(method_name, params)
 	return null
 
+
 ## 设置菜单的可用性
 func set_item_disabled(menu_path: StringName, value: bool):
 	var menu = get_menu(menu_path)
 	var idx = get_menu_idx(menu_path)
 	if menu and idx > -1:
 		menu.set_item_disabled(idx, value)
+
 
 ## 设置菜单复选框启用状态
 func set_menu_as_checkable(menu_path: StringName, value: bool):
@@ -205,9 +243,9 @@ func init_menu(data: Dictionary):
 ## 初始化快捷键，需要添加对应菜单。示例：
 ##[codeblock]
 ##{
-##    "/File/Open": {"keycode": KEY_O, "ctrl": true},
+##    "/File/Open": "ctrl+o",
 ##    "/File/Save": "Ctrl+S",
-##    "/File/Export/JSON": {"keycode": KEY_E, "shift": true, "ctrl": true},
+##    "/File/Export/JSON": "ctrl+shift+e, # 或者{"keycode": KEY_E, "shift": true, "ctrl": true}
 ##}
 ##[/codeblock]
 func init_shortcut(data_list: Dictionary):
@@ -217,6 +255,7 @@ func init_shortcut(data_list: Dictionary):
 		if data is String:
 			data = parse_shortcut(data)
 		set_menu_shortcut(menu_path, data)
+
 
 ## 初始化这些项的图标。示例：
 ##[codeblock]
@@ -307,6 +346,7 @@ func set_menu_disabled_by_path(menu_path:String, disable: bool):
 	if idx > -1:
 		var menu = get_menu(menu_path)
 		menu.set_item_disabled(idx, disable)
+
 
 ## 移除菜单
 func remove_menu(menu_path: StringName) -> bool:
